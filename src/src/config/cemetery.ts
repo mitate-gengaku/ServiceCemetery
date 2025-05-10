@@ -77,14 +77,14 @@ export const CEMETERY_POSITIONS: { position: Vector3 }[] = [
   { position: [40, 0.25, 42] },
 ];
 
-export const CEMETERY_PROJECTS = CEMETERY_POSITIONS.map(({position}, i) => ({
+export const CEMETERY_PROJECTS = CEMETERY_POSITIONS.map(({ position }, i) => ({
   title: "リポジトリ" + (i + 1),
   descripton: "説明" + (i + 1),
   tags: [
     {
-      label: "未完成"
-    }
+      label: "未完成",
+    },
   ],
   reflection: "反省文" + (i + 1),
-  position: position
-}))
+  position: position,
+}));

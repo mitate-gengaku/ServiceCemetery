@@ -2,34 +2,17 @@
 
 import { OrbitControls, useGLTF, Loader, useCursor, Sky, Html } from "@react-three/drei";
 import { Canvas, useLoader, ThreeElements, Vector3 } from "@react-three/fiber";
-import { InfoIcon, PackagePlusIcon } from "lucide-react";
 import Link from "next/link";
 import React, { useRef, useState, useEffect, Suspense } from "react";
 import * as THREE from "three";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MODELS_LIST } from "@/config/credit";
 import { CEMETERY_POSITIONS } from "@/config/cemetery";
+import { MODELS_LIST } from "@/config/credit";
 import { TREE_POSITIONS } from "@/config/tree";
 
 const Ground = () => {
@@ -141,7 +124,7 @@ const Cemetary = () => {
     "/textures/rock_01_nor_gl_4k.jpg",
     "/textures/rock_01_rough_4k.jpg",
   ]);
-  
+
   useCursor(clicked);
   useCursor(hovered);
 
@@ -403,148 +386,107 @@ const Road = (props: ThreeElements["group"]) => {
 
 const Home = () => {
   return (
-    <>
-      <header>
-        <div className="h-16 px-4 md:px-10 flex justify-between items-center font-geist-sans">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant={"ghost"} size={"icon"} className="ml-auto hidden ">
-                <PackagePlusIcon />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="font-geist-sans">
-              <DialogHeader>
-                <DialogTitle>プロジェクトの追加</DialogTitle>
-                <DialogDescription>必要な情報を記入してください</DialogDescription>
-              </DialogHeader>
-              <Button className="bg-emerald-500 hover:bg-emerald-600">プロジェクトを追加</Button>
-            </DialogContent>
-          </Dialog>
-          <Button variant={"ghost"} size={"icon"} className="hidden">
-            <InfoIcon />
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="hidden" asChild>
-              <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-64 max-w-64 font-geist-sans">
-              <DropdownMenuLabel className="py-4">My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Githubアカウントページ</DropdownMenuItem>
-              <DropdownMenuItem>ログアウト</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <h1 className="font-semibold text-2xl font-cardo cursor-default">
-            <Link href="/">RIPro</Link>
-          </h1>
-          <Button className="bg-emerald-500 hover:bg-emerald-600">ログイン</Button>
-        </div>
-      </header>
-      <main className="w-full h-[calc(100%-64px)] font-geist-sans relative flex flex-col md:flex-row">
-        <Card className="min-w-96 max-w-96 absolute top-8 right-8 z-10 hidden">
-          <CardHeader>
-            <CardTitle>Credit</CardTitle>
-            <CardDescription>以下の3Dモデルおよびテクスチャを使用しています</CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm">
-            <div>
-              <p className="mb-2">一覧</p>
-              <ul className="space-y-1">
-                {MODELS_LIST.map((model) => (
-                  <li key={model.label}>
-                    <Button variant={"link"} className="p-0 h-fit hover:text-emerald-500" asChild>
-                      <Link href={model.link} rel="noopener noreferrer" target="_blank">
-                        {model.label}
-                      </Link>
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-        <div className="w-full md:w-1/2 px-4 md:px-10 py-16 md:py-8 gap-y-4 flex flex-col justify-center">
-          <div className="space-y-1">
-            <h2 className="text-4xl  font-cardo font-semibold tracking-tight text-center md:text-left">RIPro</h2>
-            <h3 className="text-2xl font-semibold tracking-tight text-foreground text-center md:text-left">
-              失敗も成功も、すべては財産
-            </h3>
+    <div className="w-full h-full relative flex flex-col md:flex-row">
+      <Card className="min-w-96 max-w-96 absolute top-8 right-8 z-10 hidden">
+        <CardHeader>
+          <CardTitle>Credit</CardTitle>
+          <CardDescription>以下の3Dモデルおよびテクスチャを使用しています</CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm">
+          <div>
+            <p className="mb-2">一覧</p>
+            <ul className="space-y-1">
+              {MODELS_LIST.map((model) => (
+                <li key={model.label}>
+                  <Button variant={"link"} className="p-0 h-fit hover:text-emerald-500" asChild>
+                    <Link href={model.link} rel="noopener noreferrer" target="_blank">
+                      {model.label}
+                    </Link>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
-          <p className="text-muted-foreground">
-            終了したプロジェクトの記録と教訓を大切に保存するサービスです。成功も失敗も、すべての経験を組織の財産として継承し、次世代のプロジェクトに活かします。過去から学び、未来を創るため共有しましょう
-          </p>
-          <Button className="bg-emerald-500 hover:bg-emerald-600">始める</Button>
+        </CardContent>
+      </Card>
+      <div className="w-full md:w-1/2 px-4 md:px-10 py-16 md:py-8 gap-y-4 flex flex-col justify-center">
+        <div className="space-y-1">
+          <h2 className="text-4xl  font-cardo font-semibold tracking-tight text-center md:text-left">RIPro</h2>
+          <h3 className="text-2xl font-semibold tracking-tight text-foreground text-center md:text-left">
+            失敗も成功も、すべては財産
+          </h3>
         </div>
-        <Loader />
-        <Canvas
-          shadows
-          camera={{
-            position: [-40, 50, 50],
-            fov: 55,
-            near: 0.1,
-            far: 1000,
-          }}
-        >
-          <ambientLight intensity={0.5} />
-          <directionalLight
-            position={[0, 250, 0]}
-            intensity={1.2}
-            castShadow
-            shadow-mapSize-width={2048}
-            shadow-mapSize-height={2048}
-            shadow-camera-left={-50}
-            shadow-camera-right={50}
-            shadow-camera-top={50}
-            shadow-camera-bottom={-50}
-            shadow-camera-far={300}
-            shadow-bias={-0.0005}
+        <p className="text-muted-foreground">
+          終了したプロジェクトの記録と教訓を大切に保存するサービスです。成功も失敗も、すべての経験を組織の財産として継承し、次世代のプロジェクトに活かします。過去から学び、未来を創るため共有しましょう
+        </p>
+        <Button className="bg-emerald-500 hover:bg-emerald-600">始める</Button>
+      </div>
+      <Loader />
+      <Canvas
+        shadows
+        camera={{
+          position: [-40, 50, 50],
+          fov: 55,
+          near: 0.1,
+          far: 1000,
+        }}
+      >
+        <ambientLight intensity={0.5} />
+        <directionalLight
+          position={[0, 250, 0]}
+          intensity={1.2}
+          castShadow
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+          shadow-camera-left={-50}
+          shadow-camera-right={50}
+          shadow-camera-top={50}
+          shadow-camera-bottom={-50}
+          shadow-camera-far={300}
+          shadow-bias={-0.0005}
+        />
+        <spotLight
+          position={[0, 10, -35]}
+          angle={0.8}
+          penumbra={0.5}
+          intensity={1.5}
+          castShadow
+          shadow-camera-near={1}
+          shadow-camera-far={50}
+          distance={60}
+          decay={2}
+        />
+        <Suspense>
+          <Sky
+            sunPosition={[5, 100, -100]}
+            inclination={0.49}
+            azimuth={0.25}
+            rayleigh={0.5}
+            turbidity={8}
+            mieCoefficient={0.005}
+            mieDirectionalG={0.8}
           />
-          <spotLight
-            position={[0, 10, -35]}
-            angle={0.8}
-            penumbra={0.5}
-            intensity={1.5}
-            castShadow
-            shadow-camera-near={1}
-            shadow-camera-far={50}
-            distance={60}
-            decay={2}
-          />
-          <Suspense>
-            <Sky
-              sunPosition={[5, 100, -100]}
-              inclination={0.49}
-              azimuth={0.25}
-              rayleigh={0.5}
-              turbidity={8}
-              mieCoefficient={0.005}
-              mieDirectionalG={0.8}
-            />
-            <group castShadow>
-              <Tree />
-              <GraveStone />
-              <Road />
-              <Ground />
-              <Cemetary />
-            </group>
+          <group castShadow>
+            <Tree />
+            <GraveStone />
+            <Road />
+            <Ground />
+            <Cemetary />
+          </group>
 
-            <OrbitControls
-              enableZoom={true}
-              enablePan={true}
-              enableRotate={true}
-              minDistance={5}
-              maxDistance={65}
-              target={[0, 0, 0]}
-              minPolarAngle={0.1}
-              maxPolarAngle={Math.PI / 2 - 0.1}
-            />
-          </Suspense>
-        </Canvas>
-      </main>
-    </>
+          <OrbitControls
+            enableZoom={true}
+            enablePan={true}
+            enableRotate={true}
+            minDistance={5}
+            maxDistance={65}
+            target={[0, 0, 0]}
+            minPolarAngle={0.1}
+            maxPolarAngle={Math.PI / 2 - 0.1}
+          />
+        </Suspense>
+      </Canvas>
+    </div>
   );
 };
 

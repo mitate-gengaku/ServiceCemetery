@@ -28,6 +28,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MODELS_LIST } from "@/config/credit";
+import { CEMETERY_POSITIONS } from "@/config/cemetery";
+import { TREE_POSITIONS } from "@/config/tree";
 
 const Ground = () => {
   const [diffuseMap, normalMap, roughnessMap] = useLoader(THREE.TextureLoader, [
@@ -138,89 +141,13 @@ const Cemetary = () => {
     "/textures/rock_01_nor_gl_4k.jpg",
     "/textures/rock_01_rough_4k.jpg",
   ]);
-  const positions: { position: Vector3 }[] = [
-    { position: [-10, 0.25, -40] },
-    { position: [-20, 0.25, -40] },
-    { position: [-30, 0.25, -40] },
-    { position: [-40, 0.25, -40] },
-    { position: [-10, 0.25, -32] },
-    { position: [-20, 0.25, -32] },
-    { position: [-30, 0.25, -32] },
-    { position: [-40, 0.25, -32] },
-    { position: [-10, 0.25, -18] },
-    { position: [-20, 0.25, -18] },
-    { position: [-30, 0.25, -18] },
-    { position: [-40, 0.25, -18] },
-    { position: [-10, 0.25, -8] },
-    { position: [-20, 0.25, -8] },
-    { position: [-30, 0.25, -8] },
-    { position: [-40, 0.25, -8] },
-    { position: [-10, 0.25, 2] },
-    { position: [-20, 0.25, 2] },
-    { position: [-30, 0.25, 2] },
-    { position: [-40, 0.25, 2] },
-    { position: [-10, 0.25, 12] },
-    { position: [-20, 0.25, 12] },
-    { position: [-30, 0.25, 12] },
-    { position: [-40, 0.25, 12] },
-    { position: [-10, 0.25, 20] },
-    { position: [-20, 0.25, 20] },
-    { position: [-30, 0.25, 20] },
-    { position: [-40, 0.25, 20] },
-    { position: [-10, 0.25, 32] },
-    { position: [-20, 0.25, 32] },
-    { position: [-30, 0.25, 32] },
-    { position: [-40, 0.25, 32] },
-    { position: [-10, 0.25, 42] },
-    { position: [-20, 0.25, 42] },
-    { position: [-30, 0.25, 42] },
-    { position: [-40, 0.25, 42] },
-
-    //
-    { position: [10, 0.25, -40] },
-    { position: [20, 0.25, -40] },
-    { position: [30, 0.25, -40] },
-    { position: [40, 0.25, -40] },
-    { position: [10, 0.25, -32] },
-    { position: [20, 0.25, -32] },
-    { position: [30, 0.25, -32] },
-    { position: [40, 0.25, -32] },
-    { position: [10, 0.25, -18] },
-    { position: [20, 0.25, -18] },
-    { position: [30, 0.25, -18] },
-    { position: [40, 0.25, -18] },
-    { position: [10, 0.25, -8] },
-    { position: [20, 0.25, -8] },
-    { position: [30, 0.25, -8] },
-    { position: [40, 0.25, -8] },
-    { position: [10, 0.25, 2] },
-    { position: [20, 0.25, 2] },
-    { position: [30, 0.25, 2] },
-    { position: [40, 0.25, 2] },
-    { position: [10, 0.25, 12] },
-    { position: [20, 0.25, 12] },
-    { position: [30, 0.25, 12] },
-    { position: [40, 0.25, 12] },
-    { position: [10, 0.25, 20] },
-    { position: [20, 0.25, 20] },
-    { position: [30, 0.25, 20] },
-    { position: [40, 0.25, 20] },
-    { position: [10, 0.25, 32] },
-    { position: [20, 0.25, 32] },
-    { position: [30, 0.25, 32] },
-    { position: [40, 0.25, 32] },
-    { position: [10, 0.25, 42] },
-    { position: [20, 0.25, 42] },
-    { position: [30, 0.25, 42] },
-    { position: [40, 0.25, 42] },
-  ];
-
+  
   useCursor(clicked);
   useCursor(hovered);
 
   return (
     <group ref={groupRef}>
-      {positions.map(({ position }, i) => {
+      {CEMETERY_POSITIONS.map(({ position }, i) => {
         const clonedScene = scene.clone(true);
 
         return (
@@ -334,19 +261,6 @@ const Tree = (props: ThreeElements["group"]) => {
   const groupRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF("/models/Tree-2.glb");
 
-  const positions: { position: Vector3; scale?: number | undefined }[] = [
-    { position: [16, 13, -25], scale: 8 },
-    { position: [16, 13, 28], scale: 8 },
-    { position: [42, 13, -25], scale: 8 },
-    { position: [42, 13, 28], scale: 8 },
-
-    //
-    { position: [-16, 13, -25], scale: 8 },
-    { position: [-16, 13, 28], scale: 8 },
-    { position: [-42, 13, -25], scale: 8 },
-    { position: [-42, 13, 28], scale: 8 },
-  ];
-
   useEffect(() => {
     if (scene) {
       scene.traverse((child) => {
@@ -360,7 +274,7 @@ const Tree = (props: ThreeElements["group"]) => {
 
   return (
     <group {...props} ref={groupRef} castShadow>
-      {positions.map(({ position, scale }, index) => {
+      {TREE_POSITIONS.map(({ position, scale }, index) => {
         const clonedScene = scene.clone(true);
 
         clonedScene.traverse((child) => {
@@ -416,33 +330,6 @@ const GraveStone = () => {
     </group>
   );
 };
-
-const models = [
-  {
-    label: "Cemetary by Poly by Google",
-    link: "https://poly.pizza/m/c5L6hAdX3ua",
-  },
-  {
-    label: "Gravestone by Poly by Google",
-    link: "https://poly.pizza/m/125x68MbyA0",
-  },
-  {
-    label: "Rock Path Round Thin by Quaternius",
-    link: "https://poly.pizza/m/L1GeXpXEPY",
-  },
-  {
-    label: "Tree-2 by Marc Solà",
-    link: "https://poly.pizza/m/cRipmFHCEVU",
-  },
-  {
-    label: "Forest Ground 01 by Rob Tuytel",
-    link: "https://polyhaven.com/a/forrest_ground_01",
-  },
-  {
-    label: "Rock 01 by Rob Tuytel",
-    link: "https://polyhaven.com/a/rock_01",
-  },
-];
 
 const Road = (props: ThreeElements["group"]) => {
   const groupRef = useRef<THREE.Group>(null);
@@ -566,7 +453,7 @@ const Home = () => {
             <div>
               <p className="mb-2">一覧</p>
               <ul className="space-y-1">
-                {models.map((model) => (
+                {MODELS_LIST.map((model) => (
                   <li key={model.label}>
                     <Button variant={"link"} className="p-0 h-fit hover:text-emerald-500" asChild>
                       <Link href={model.link} rel="noopener noreferrer" target="_blank">

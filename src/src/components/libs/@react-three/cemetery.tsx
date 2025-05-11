@@ -2,6 +2,7 @@
 
 import { useGLTF, useCursor, Html } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
+import { useAtom } from "jotai";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
 import * as THREE from "three";
@@ -13,14 +14,15 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressChart } from "@/components/utils/progress-chart";
 import { CEMETERY_PROJECTS } from "@/config/cemetery";
+import { mermaidFamily } from "@/store/mermaid";
 import { cn } from "@/utils/cn";
 
 export const Cemetery = () => {
-  const [mermaidText, setMermaidText] = useState<string>("");
+  const [selectIndex, setSelectIndex] = useState<number>(0);
+  const [mermaidText, setMermaidText] = useAtom(mermaidFamily({ id: selectIndex.toString(), text: "" }));
   const [clicked, setClicked] = useState<boolean>(false);
   const [hovered, setHovered] = useState<boolean>(false);
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [selectIndex, setSelectIndex] = useState<number>(0);
   const groupRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF("/models/Cemetary.glb");
   const [diffuseMap, normalMap, roughnessMap] = useLoader(THREE.TextureLoader, [
@@ -37,7 +39,9 @@ export const Cemetery = () => {
     await new Promise((resolv) => setTimeout(resolv, 5000));
 
     setLoading(false);
-    setMermaidText(`~~~mermaid
+    setMermaidText({
+      id: selectIndex.toString(),
+      text: `~~~mermaid
 flowchart LR
   subgraph "フロントエンド"
       A[ページ] --> B[Reactコンポーネント];
@@ -64,7 +68,8 @@ flowchart LR
   style F fill:#ccf,stroke:#333,stroke-width:2px
   style G fill:#ccf,stroke:#333,stroke-width:2px
   style H fill:#ccf,stroke:#333,stroke-width:2px
-~~~`);
+~~~`,
+    });
   };
 
   return (
@@ -158,9 +163,9 @@ flowchart LR
                 </TabsContent>
                 <TabsContent value="ai">
                   <div>
-                    {mermaidText.length ? (
+                    {mermaidText.text.length ? (
                       <div className="py-8 flex items-center justify-center flex-col gap-4">
-                        <Markdown code={mermaidText} />
+                        <Markdown code={mermaidText.text} />
                         <Button
                           type="button"
                           onClick={() => generate()}

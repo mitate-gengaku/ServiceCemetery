@@ -16,7 +16,7 @@ export const Mermaid = (props: { code: string }) => {
         outputRef.current.innerHTML = "Invalid syntax";
       }
     }
-  }, [code]);
+  }, [code, id]);
 
   React.useEffect(() => {
     render();

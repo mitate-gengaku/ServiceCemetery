@@ -2,6 +2,7 @@
 
 import { useGLTF, useCursor, Html } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
+import { Vector3 } from "@react-three/fiber";
 import { useAtom } from "jotai";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
@@ -17,7 +18,21 @@ import { CEMETERY_PROJECTS } from "@/config/cemetery";
 import { mermaidFamily } from "@/store/mermaid";
 import { cn } from "@/utils/cn";
 
-export const Cemetery = () => {
+interface Props {
+  projects?:
+    | {
+        title: string;
+        descripton: string;
+        tags: {
+          label: string;
+        }[];
+        reflection: string;
+        position: number | Vector3 | [x: number, y: number, z: number];
+      }[]
+    | undefined;
+}
+
+export const Cemetery = ({ projects = CEMETERY_PROJECTS }: Props) => {
   const [selectIndex, setSelectIndex] = useState<number>(0);
   const [mermaidText, setMermaidText] = useAtom(mermaidFamily({ id: selectIndex.toString(), text: "" }));
   const [clicked, setClicked] = useState<boolean>(false);
@@ -74,7 +89,7 @@ flowchart LR
 
   return (
     <group ref={groupRef}>
-      {CEMETERY_PROJECTS.map(({ position }, i) => {
+      {projects.map(({ position }, i) => {
         const clonedScene = scene.clone(true);
 
         return (

@@ -6,7 +6,7 @@ const MainLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
     <>
       <Header />
-      <main className="w-full h-[calc(100%-64px)] font-geist-sans">{children}</main>
+      <main className="w-full h-[calc(100%-64px)] font-geist-sans overflow-x-hidden">{children}</main>
     </>
   );
 };

@@ -2,7 +2,7 @@
 
 import { ChevronDownIcon, XIcon } from "lucide-react";
 import { useState } from "react";
-import Select, { components, MultiValue } from "react-select";
+import Select, { components, type MultiValue } from "react-select";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

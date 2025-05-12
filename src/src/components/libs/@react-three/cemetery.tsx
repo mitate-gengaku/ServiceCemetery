@@ -2,7 +2,7 @@
 
 import { useGLTF, useCursor, Html } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
-import { Vector3 } from "@react-three/fiber";
+import { type Vector3 } from "@react-three/fiber";
 import { useAtom } from "jotai";
 import Link from "next/link";
 import React, { useRef, useState } from "react";

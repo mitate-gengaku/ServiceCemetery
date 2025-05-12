@@ -1,4 +1,4 @@
-import { Vector3 } from "@react-three/fiber";
+import { type Vector3 } from "@react-three/fiber";
 
 export const ROAD_POSITIONS: { position: Vector3 }[] = [
   { position: [1.5, -0.5, -40] },

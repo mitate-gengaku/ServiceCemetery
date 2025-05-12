@@ -1,6 +1,7 @@
 import { Geist, Cardo } from "next/font/google";
 
 import "@/app/globals.css";
+import { TRPCReactProvider } from "@/trpc/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <body className={`w-screen h-screen ${geistSans.variable} ${cardo.variable} antialiased`}>{children}</body>
+      <body className={`w-screen h-screen ${geistSans.variable} ${cardo.variable} antialiased`}>
+        <TRPCReactProvider>{children}</TRPCReactProvider>
+      </body>
     </html>
   );
 }

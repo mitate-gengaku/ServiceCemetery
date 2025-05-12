@@ -1,9 +1,10 @@
 "use client";
 
 import { useGLTF } from "@react-three/drei";
-import { ThreeElements } from "@react-three/fiber";
+import { type ThreeElements } from "@react-three/fiber";
 import React, { useRef } from "react";
-import * as THREE from "three";
+
+import type * as THREE from "three";
 
 import { ROAD_POSITIONS } from "@/config/road";
 

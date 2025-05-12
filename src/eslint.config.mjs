@@ -4,6 +4,7 @@ import { FlatCompat } from "@eslint/eslintrc";
 import importPlugin from 'eslint-plugin-import';
 import unusedImports from 'eslint-plugin-unused-imports';
 import importAlias from 'eslint-plugin-import-alias';
+import drizzle from "eslint-plugin-drizzle";
 import tseslint from '@typescript-eslint/eslint-plugin';
 import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths'
 import tseslintParser from '@typescript-eslint/parser';
@@ -29,10 +30,34 @@ const eslintConfig = [
       'unused-imports': unusedImports,
       'import-alias': importAlias,
       'import': importPlugin,
-      'no-relative-import-paths': noRelativeImportPaths
+      'no-relative-import-paths': noRelativeImportPaths,
+      drizzle,
     },
     rules: {
       // eslint
+      "@typescript-eslint/array-type": "off",
+      "@typescript-eslint/consistent-type-definitions": "off",
+      "@typescript-eslint/consistent-type-imports": [
+        "warn",
+        { prefer: "type-imports", fixStyle: "inline-type-imports" },
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/no-misused-promises": [
+        "error",
+        { checksVoidReturn: { attributes: false } },
+      ],
+      "drizzle/enforce-delete-with-where": [
+        "error",
+        { drizzleObjectName: ["db", "ctx.db"] },
+      ],
+      "drizzle/enforce-update-with-where": [
+        "error",
+        { drizzleObjectName: ["db", "ctx.db"] },
+      ],
       'array-bracket-newline': ['error', { multiline: true }],
       'arrow-spacing': ['error', { before: true, after: true }],
       'block-spacing': ['error', 'always'],

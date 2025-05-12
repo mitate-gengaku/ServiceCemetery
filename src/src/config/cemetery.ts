@@ -1,4 +1,4 @@
-import { Vector3 } from "@react-three/fiber";
+import { type Vector3 } from "@react-three/fiber";
 
 export const CEMETERY_POSITIONS: { position: Vector3 }[] = [
   { position: [-40, 0.25, -40] },

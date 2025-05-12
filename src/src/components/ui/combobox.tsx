@@ -39,6 +39,7 @@ export function Combobox({ objects, placeholder = "選択してください" }: 
                     setValue(currentValue === value ? "" : currentValue);
                     setOpen(false);
                   }}
+                  className="data-[selected=true]:bg-emerald-50"
                 >
                   {object.label}
                   <Check

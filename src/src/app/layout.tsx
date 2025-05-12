@@ -10,6 +10,7 @@ const geistSans = Geist({
 const cardo = Cardo({
   weight: ["400", "700"],
   variable: "--font-cardo",
+  subsets: ["latin"],
 });
 
 export default function RootLayout({
@@ -18,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ja" suppressHydrationWarning>
       <body className={`w-screen h-screen ${geistSans.variable} ${cardo.variable} antialiased`}>{children}</body>
     </html>
   );

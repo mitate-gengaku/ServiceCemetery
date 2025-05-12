@@ -28,8 +28,6 @@ export const Ground = () => {
     "/textures/forrest_ground_01_rough_4k.jpg",
   ]);
 
-  if (!diffuseMap || !normalMap || !roughnessMap) return null;
-
   return (
     <>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.49, 0]} receiveShadow>

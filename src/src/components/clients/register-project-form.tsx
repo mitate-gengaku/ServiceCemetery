@@ -125,7 +125,7 @@ export const RegisterProjectForm = () => {
           rows={55}
         />
       </div>
-      <Button className="bg-emerald-500 hover:bg-emerald-500 ">プロジェクトを追加する</Button>
+      <Button className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer">プロジェクトを追加する</Button>
     </form>
   );
 };

@@ -10,7 +10,11 @@ import { Ground } from "@/components/libs/@react-three/ground";
 import { Road } from "@/components/libs/@react-three/road";
 import { Tree } from "@/components/libs/@react-three/tree";
 
-export const MainCanvas = () => (
+interface Props {
+  isMyProject?: boolean | undefined;
+}
+
+export const MainCanvas = ({ isMyProject = false }: Props) => (
   <>
     <Loader />
     <Canvas
@@ -63,7 +67,7 @@ export const MainCanvas = () => (
           <GraveStone />
           <Road />
           <Ground />
-          <Cemetery />
+          <Cemetery isMyProject={isMyProject} />
         </group>
 
         <OrbitControls

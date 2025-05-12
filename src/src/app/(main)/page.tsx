@@ -12,7 +12,7 @@ const Home = async () => {
   return (
     <div className="w-full h-full relative flex flex-col md:flex-row">
       <TopSection>{session ? <RegisterProjectForm /> : <TopSectionClient />}</TopSection>
-      <MainCanvas />
+      <MainCanvas isMyProject={true} />
     </div>
   );
 };

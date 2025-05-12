@@ -30,9 +30,10 @@ interface Props {
         position: number | Vector3 | [x: number, y: number, z: number];
       }[]
     | undefined;
+  isMyProject?: boolean;
 }
 
-export const Cemetery = ({ projects = CEMETERY_PROJECTS }: Props) => {
+export const Cemetery = ({ projects = CEMETERY_PROJECTS, isMyProject = false }: Props) => {
   const [selectIndex, setSelectIndex] = useState<number>(0);
   const [mermaidText, setMermaidText] = useAtom(mermaidFamily({ id: selectIndex.toString(), text: "" }));
   const [clicked, setClicked] = useState<boolean>(false);
@@ -129,7 +130,7 @@ flowchart LR
                 <TabsList>
                   <TabsTrigger value="detail">基本情報</TabsTrigger>
                   <TabsTrigger value="reflection">反省点</TabsTrigger>
-                  <TabsTrigger value="ai">AI解析</TabsTrigger>
+                  {isMyProject && <TabsTrigger value="ai">AI解析</TabsTrigger>}
                 </TabsList>
                 <TabsContent value="detail">
                   <div className="py-4 space-y-3">
@@ -176,26 +177,12 @@ flowchart LR
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="ai">
-                  <div>
-                    {mermaidText.text.length ? (
-                      <div className="py-8 flex items-center justify-center flex-col gap-4">
-                        <Markdown code={mermaidText.text} />
-                        <Button
-                          type="button"
-                          onClick={() => generate()}
-                          className={cn(
-                            "bg-emerald-500 hover:bg-blur-600 transition-all cursor-pointer disabled:bg-emerald-500 disabled:opacity-100",
-                            isLoading ? "animate-pulse" : "",
-                          )}
-                          disabled={isLoading}
-                        >
-                          やり直す
-                        </Button>
-                      </div>
-                    ) : (
-                      <>
+                {isMyProject && (
+                  <TabsContent value="ai">
+                    <div>
+                      {mermaidText.text.length ? (
                         <div className="py-8 flex items-center justify-center flex-col gap-4">
+                          <Markdown code={mermaidText.text} />
                           <Button
                             type="button"
                             onClick={() => generate()}
@@ -205,22 +192,38 @@ flowchart LR
                             )}
                             disabled={isLoading}
                           >
-                            アーキテクチャ図を作成
+                            やり直す
                           </Button>
                         </div>
-                        <ul className="pl-4 space-y-1">
-                          <li className="list-disc text-xs text-muted-foreground">
-                            Gemini 1.5 Flash APIの無料プランを使用します
-                          </li>
-                          <li className="list-disc text-xs text-muted-foreground">
-                            送信したデータ内容はGoogleのAIの学習に使用されますのでご注意ください
-                          </li>
-                          <li className="list-disc text-xs text-muted-foreground">生成に失敗することがあります</li>
-                        </ul>
-                      </>
-                    )}
-                  </div>
-                </TabsContent>
+                      ) : (
+                        <>
+                          <div className="py-8 flex items-center justify-center flex-col gap-4">
+                            <Button
+                              type="button"
+                              onClick={() => generate()}
+                              className={cn(
+                                "bg-emerald-500 hover:bg-blur-600 transition-all cursor-pointer disabled:bg-emerald-500 disabled:opacity-100",
+                                isLoading ? "animate-pulse" : "",
+                              )}
+                              disabled={isLoading}
+                            >
+                              アーキテクチャ図を作成
+                            </Button>
+                          </div>
+                          <ul className="pl-4 space-y-1">
+                            <li className="list-disc text-xs text-muted-foreground">
+                              Gemini 1.5 Flash APIの無料プランを使用します
+                            </li>
+                            <li className="list-disc text-xs text-muted-foreground">
+                              送信したデータ内容はGoogleのAIの学習に使用されますのでご注意ください
+                            </li>
+                            <li className="list-disc text-xs text-muted-foreground">生成に失敗することがあります</li>
+                          </ul>
+                        </>
+                      )}
+                    </div>
+                  </TabsContent>
+                )}
               </Tabs>
             </div>
           </DialogContent>

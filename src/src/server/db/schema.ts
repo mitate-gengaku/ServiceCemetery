@@ -28,6 +28,21 @@ export const posts = createTable(
   (t) => [index("created_by_idx").on(t.createdById), index("name_idx").on(t.name)],
 );
 
+export const tags = createTable("tag", (d) => ({
+  id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+  label: d.varchar({ length: 256 }).notNull(),
+  value: d.varchar({ length: 256 }).notNull(),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+}));
+
+/**
+ * User関連
+ */
+
 export const users = createTable("user", (d) => ({
   id: d
     .varchar({ length: 255 })

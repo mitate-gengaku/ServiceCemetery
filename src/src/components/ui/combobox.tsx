@@ -6,14 +6,16 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { type Repository } from "@/types/repository";
 import { cn } from "@/utils/cn";
 
 interface Props {
-  objects: { value: string; label: string }[];
+  objects: Repository[];
   placeholder?: string | undefined;
+  setSelectedOption: React.Dispatch<React.SetStateAction<Repository>>;
 }
 
-export function Combobox({ objects, placeholder = "選択してください" }: Props) {
+export function Combobox({ objects, placeholder = "選択してください", setSelectedOption }: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
 
@@ -21,7 +23,7 @@ export function Combobox({ objects, placeholder = "選択してください" }: 
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="min-w-[200px] justify-between">
-          {value ? objects.find((object) => object.value === value)?.label : placeholder}
+          {value ? objects.find((object) => object.name === value)?.name : placeholder}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -33,17 +35,22 @@ export function Combobox({ objects, placeholder = "選択してください" }: 
             <CommandGroup>
               {objects.map((object) => (
                 <CommandItem
-                  key={object.value}
-                  value={object.value}
+                  key={object.name}
+                  value={object.name}
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? "" : currentValue);
+                    setSelectedOption({
+                      name: object.name,
+                      description: object.description,
+                      url: object.url,
+                    });
                     setOpen(false);
                   }}
                   className="data-[selected=true]:bg-emerald-50"
                 >
-                  {object.label}
+                  {object.name}
                   <Check
-                    className={cn("ml-auto text-emerald-500", value === object.value ? "opacity-100" : "opacity-0")}
+                    className={cn("ml-auto text-emerald-500", value === object.name ? "opacity-100" : "opacity-0")}
                   />
                 </CommandItem>
               ))}

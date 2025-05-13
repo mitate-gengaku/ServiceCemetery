@@ -10,7 +10,7 @@ export const UserSection = () => {
       <Avatar className="size-36 rounded-sm">
         <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
         <AvatarFallback>
-          <UserIcon />
+          <UserIcon className="rounded-sm" />
         </AvatarFallback>
       </Avatar>
       <div>

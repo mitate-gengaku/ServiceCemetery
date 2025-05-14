@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDownIcon, XIcon } from "lucide-react";
+import { ChevronDownIcon, CircleHelpIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import Select, { components, type MultiValue } from "react-select";
 
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { api } from "@/trpc/react";
 import { type Repository } from "@/types/repository";
 import { type Tag } from "@/types/tag";
 import { cn } from "@/utils/cn";
@@ -24,11 +26,27 @@ export const RegisterProjectForm = ({ tags, repositories }: Props) => {
     description: "",
     url: "",
   });
+  const [reflection, setReflection] = useState<string>("");
   const [selectedOptions, setSelectedOptions] = useState<MultiValue<{ label: string; value: string }>>([]);
+  const utils = api.useUtils();
+  const createProject = api.project.create.useMutation({
+    onSuccess: async () => {
+      await utils.project.invalidate();
+    },
+  });
 
   if (!tags.length) return <></>;
   return (
-    <form className="space-y-4">
+    <form
+      className="space-y-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        createProject.mutate({
+          ...selectedRepository,
+          reflection,
+        });
+      }}
+    >
       <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">プロジェクトを追加</h3>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">リポジトリ</Label>
@@ -40,26 +58,53 @@ export const RegisterProjectForm = ({ tags, repositories }: Props) => {
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">プロジェクト名</Label>
-        <div className="dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed">
+        <div
+          className={cn(
+            "dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed",
+            selectedRepository.name && "opacity-50",
+          )}
+        >
           {selectedRepository.name}
         </div>
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">プロジェクトの概要</Label>
-        <div className="border-input dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed">
+        <div
+          className={cn(
+            "border-input dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed",
+            selectedRepository.description && "opacity-50",
+          )}
+        >
           {selectedRepository.description}
         </div>
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">プロジェクトのリンク</Label>
-        <div className="dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed">
+        <div
+          className={cn(
+            "dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed",
+            selectedRepository.url && "opacity-50",
+          )}
+        >
           {selectedRepository.url}
         </div>
       </div>
       <div className="space-y-1">
-        <Label className="text-muted-foreground text-xs">
-          ステータス<span className="text-red-500 text-base">*</span>
-        </Label>
+        <div className="flex items-center justify-between">
+          <Label className="text-muted-foreground text-xs">
+            ステータス<span className="text-red-500 text-base">*</span>
+          </Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="cursor-pointer">
+                  <CircleHelpIcon className="size-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>プロジェクトを終了した理由を選択してください</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <Select
           options={tags}
           className="text-sm cursor-pointer"
@@ -119,10 +164,12 @@ export const RegisterProjectForm = ({ tags, repositories }: Props) => {
         />
       </div>
       <div className="space-y-1">
-        <Label className="text-muted-foreground text-xs">終了した理由</Label>
+        <Label className="text-muted-foreground text-xs">終了した理由・反省など</Label>
         <Textarea
           className="resize-none text-xs min-h-20 focus-visible:ring-2 focus-visible:ring-emerald-500"
           rows={55}
+          value={reflection}
+          onChange={(e) => setReflection(e.target.value)}
         />
       </div>
       <Button className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer">プロジェクトを追加する</Button>

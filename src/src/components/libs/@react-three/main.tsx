@@ -9,12 +9,15 @@ import { GraveStone } from "@/components/libs/@react-three/grave-stone";
 import { Ground } from "@/components/libs/@react-three/ground";
 import { Road } from "@/components/libs/@react-three/road";
 import { Tree } from "@/components/libs/@react-three/tree";
+import { CEMETERY_PROJECTS } from "@/config/cemetery";
+import { type Project } from "@/types/project";
 
 interface Props {
+  projects?: Project[] | undefined;
   isMyProject?: boolean | undefined;
 }
 
-export const MainCanvas = ({ isMyProject = false }: Props) => (
+export const MainCanvas = ({ projects = CEMETERY_PROJECTS, isMyProject = false }: Props) => (
   <>
     <Loader />
     <Canvas
@@ -67,7 +70,7 @@ export const MainCanvas = ({ isMyProject = false }: Props) => (
           <GraveStone />
           <Road />
           <Ground />
-          <Cemetery isMyProject={isMyProject} />
+          <Cemetery projects={projects} isMyProject={isMyProject} />
         </group>
 
         <OrbitControls

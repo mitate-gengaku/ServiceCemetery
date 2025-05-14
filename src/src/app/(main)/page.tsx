@@ -1,6 +1,7 @@
 import React from "react";
 
 import { TopSectionClient } from "@/components/clients/top";
+import { MainCanvas } from "@/components/libs/@react-three/main";
 import { AuthHome } from "@/components/pages/home";
 import { TopSection } from "@/components/utils/top-section";
 import { auth } from "@/server/auth";
@@ -14,9 +15,7 @@ const Home = async () => {
         <TopSection>
           <TopSectionClient />
         </TopSection>
-        {/**
-         * <MainCanvas isMyProject={true} />
-         */}
+        <MainCanvas isMyProject={true} />
       </div>
     );
   }

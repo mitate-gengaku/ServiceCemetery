@@ -2,38 +2,33 @@
 
 import { useGLTF, useCursor, Html } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
-import { type Vector3 } from "@react-three/fiber";
 import { useAtom } from "jotai";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
 import { Markdown } from "@/components/libs/react-markdown/markdown";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressChart } from "@/components/utils/progress-chart";
-import { CEMETERY_PROJECTS } from "@/config/cemetery";
+import { CEMETERY_POSITIONS } from "@/config/cemetery";
 import { mermaidFamily } from "@/store/mermaid";
+import { type Project } from "@/types/project";
 import { cn } from "@/utils/cn";
 
 interface Props {
-  projects?:
-    | {
-        title: string;
-        descripton: string;
-        tags: {
-          label: string;
-        }[];
-        reflection: string;
-        position: number | Vector3 | [x: number, y: number, z: number];
-      }[]
-    | undefined;
+  projects: Project[];
   isMyProject?: boolean;
 }
 
-export const Cemetery = ({ projects = CEMETERY_PROJECTS, isMyProject = false }: Props) => {
+export const Cemetery = ({ projects, isMyProject = false }: Props) => {
+  const mergedProjects = useMemo(() => {
+    return projects.map((project, i) => ({
+      ...project,
+      position: CEMETERY_POSITIONS[i].position,
+    }));
+  }, [projects]);
   const [selectIndex, setSelectIndex] = useState<number>(0);
   const [mermaidText, setMermaidText] = useAtom(mermaidFamily({ id: selectIndex.toString(), text: "" }));
   const [clicked, setClicked] = useState<boolean>(false);
@@ -90,7 +85,7 @@ flowchart LR
 
   return (
     <group ref={groupRef}>
-      {projects.map(({ position }, i) => {
+      {mergedProjects.map(({ position }, i) => {
         const clonedScene = scene.clone(true);
 
         return (
@@ -118,86 +113,74 @@ flowchart LR
           </group>
         );
       })}
-      <Html>
-        <Dialog open={clicked} onOpenChange={setClicked}>
-          <DialogContent className="xl:min-w-4xl xl:max-w-4xl font-geist-sans">
-            <DialogHeader>
-              <DialogTitle>{CEMETERY_PROJECTS[selectIndex].title}</DialogTitle>
-              <DialogDescription>「{CEMETERY_PROJECTS[selectIndex].title}」の情報</DialogDescription>
-            </DialogHeader>
-            <div>
-              <Tabs defaultValue="detail">
-                <TabsList>
-                  <TabsTrigger value="detail">基本情報</TabsTrigger>
-                  <TabsTrigger value="reflection">反省点</TabsTrigger>
-                  {isMyProject && <TabsTrigger value="ai">AI解析</TabsTrigger>}
-                </TabsList>
-                <TabsContent value="detail">
-                  <div className="py-4 space-y-3">
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground font-semibold">プロジェクト名</p>
-                      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-                        {CEMETERY_PROJECTS[selectIndex].title}
-                      </h3>
+      {mergedProjects.length && (
+        <Html>
+          <Dialog open={clicked} onOpenChange={setClicked}>
+            <DialogContent className="xl:min-w-4xl xl:max-w-4xl font-geist-sans">
+              <DialogHeader>
+                <DialogTitle>{mergedProjects[selectIndex].name}</DialogTitle>
+                <DialogDescription>「{mergedProjects[selectIndex].name}」の情報</DialogDescription>
+              </DialogHeader>
+              <div>
+                <Tabs defaultValue="detail">
+                  <TabsList>
+                    <TabsTrigger value="detail">基本情報</TabsTrigger>
+                    <TabsTrigger value="reflection">反省点</TabsTrigger>
+                    {isMyProject && <TabsTrigger value="ai">AI解析</TabsTrigger>}
+                  </TabsList>
+                  <TabsContent value="detail">
+                    <div className="py-4 space-y-3">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground font-semibold">プロジェクト名</p>
+                        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                          {mergedProjects[selectIndex].name}
+                        </h3>
+                      </div>
+                      {mergedProjects[selectIndex].description && (
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground font-semibold">プロジェクトの概要</p>
+                          <p className="text-sm tracking-tight">{mergedProjects[selectIndex].description}</p>
+                        </div>
+                      )}
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground font-semibold">言語</p>
+                        <ProgressChart languages={mergedProjects[selectIndex].languages} />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground font-semibold">リポジトリのリンク</p>
+                        <Link
+                          href={mergedProjects[selectIndex].url}
+                          className="font-semibold tracking-tight hover:text-emerald-600"
+                        >
+                          {mergedProjects[selectIndex].url}
+                        </Link>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground font-semibold">プロジェクトの概要</p>
-                      <p className="text-sm tracking-tight">{CEMETERY_PROJECTS[selectIndex].descripton}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground font-semibold">言語</p>
-                      <ProgressChart />
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground font-semibold">リポジトリのリンク</p>
-                      <Link
-                        href={`https://github.com/`}
-                        className="font-semibold tracking-tight hover:text-emerald-600"
-                      >
-                        プロジェクトタイトル
-                      </Link>
-                    </div>
-                  </div>
-                </TabsContent>
-                <TabsContent value="reflection">
-                  <div className="py-4 space-y-3">
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground font-semibold">終了した理由</p>
-                      <p className="text-sm tracking-tight">{CEMETERY_PROJECTS[selectIndex].reflection}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground font-semibold">タグ</p>
-                      <div className="flex items-center flex-wrap gap-2">
-                        {CEMETERY_PROJECTS[selectIndex].tags.map((tag, i) => (
+                  </TabsContent>
+                  <TabsContent value="reflection">
+                    <div className="py-4 space-y-3">
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground font-semibold">終了した理由</p>
+                        <p className="text-sm tracking-tight">{mergedProjects[selectIndex].reflection}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs text-muted-foreground font-semibold">タグ</p>
+                        <div className="flex items-center flex-wrap gap-2">
+                          {/*mergedProjects[selectIndex].tags.map((tag, i) => (
                           <Badge className="cursor-pointer bg-emerald-500 hover:bg-emerald-600" key={i}>
                             {tag.label}
                           </Badge>
-                        ))}
+                        ))*/}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </TabsContent>
-                {isMyProject && (
-                  <TabsContent value="ai">
-                    <div>
-                      {mermaidText.text.length ? (
-                        <div className="py-8 flex items-center justify-center flex-col gap-4">
-                          <Markdown code={mermaidText.text} />
-                          <Button
-                            type="button"
-                            onClick={() => generate()}
-                            className={cn(
-                              "bg-emerald-500 hover:bg-blur-600 transition-all cursor-pointer disabled:bg-emerald-500 disabled:opacity-100",
-                              isLoading ? "animate-pulse" : "",
-                            )}
-                            disabled={isLoading}
-                          >
-                            やり直す
-                          </Button>
-                        </div>
-                      ) : (
-                        <>
+                  </TabsContent>
+                  {isMyProject && (
+                    <TabsContent value="ai">
+                      <div>
+                        {mermaidText.text.length ? (
                           <div className="py-8 flex items-center justify-center flex-col gap-4">
+                            <Markdown code={mermaidText.text} />
                             <Button
                               type="button"
                               onClick={() => generate()}
@@ -207,28 +190,44 @@ flowchart LR
                               )}
                               disabled={isLoading}
                             >
-                              アーキテクチャ図を作成
+                              やり直す
                             </Button>
                           </div>
-                          <ul className="pl-4 space-y-1">
-                            <li className="list-disc text-xs text-muted-foreground">
-                              Gemini 1.5 Flash APIの無料プランを使用します
-                            </li>
-                            <li className="list-disc text-xs text-muted-foreground">
-                              送信したデータ内容はGoogleのAIの学習に使用されますのでご注意ください
-                            </li>
-                            <li className="list-disc text-xs text-muted-foreground">生成に失敗することがあります</li>
-                          </ul>
-                        </>
-                      )}
-                    </div>
-                  </TabsContent>
-                )}
-              </Tabs>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </Html>
+                        ) : (
+                          <>
+                            <div className="py-8 flex items-center justify-center flex-col gap-4">
+                              <Button
+                                type="button"
+                                onClick={() => generate()}
+                                className={cn(
+                                  "bg-emerald-500 hover:bg-blur-600 transition-all cursor-pointer disabled:bg-emerald-500 disabled:opacity-100",
+                                  isLoading ? "animate-pulse" : "",
+                                )}
+                                disabled={isLoading}
+                              >
+                                アーキテクチャ図を作成
+                              </Button>
+                            </div>
+                            <ul className="pl-4 space-y-1">
+                              <li className="list-disc text-xs text-muted-foreground">
+                                Gemini 1.5 Flash APIの無料プランを使用します
+                              </li>
+                              <li className="list-disc text-xs text-muted-foreground">
+                                送信したデータ内容はGoogleのAIの学習に使用されますのでご注意ください
+                              </li>
+                              <li className="list-disc text-xs text-muted-foreground">生成に失敗することがあります</li>
+                            </ul>
+                          </>
+                        )}
+                      </div>
+                    </TabsContent>
+                  )}
+                </Tabs>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </Html>
+      )}
     </group>
   );
 };

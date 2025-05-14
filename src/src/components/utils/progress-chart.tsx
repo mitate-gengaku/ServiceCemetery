@@ -1,9 +1,32 @@
-export const ProgressChart = () => {
-  const segments = [
-    { value: 55, color: "#3B82F6", start: 0, end: 55, language: "JavaScript" },
-    { value: 30, color: "#22C55E", start: 55, end: 85, language: "HTML" },
-    { value: 15, color: "#A855F7", start: 85, end: 100, language: "CSS" },
-  ];
+type Language = {
+  value: number;
+  color: string;
+  // start: number;
+  // end: number;
+  language: string;
+};
+
+const convertLanguages = (languages: { [key: string]: number }) => {
+  const result: Language[] = [];
+  const keys = Object.keys(languages);
+  const values = Object.values(languages);
+  const maxValue = values.reduce((accum, current) => {
+    return accum + current;
+  });
+
+  for (let i = 0; i < keys.length; i++) {
+    result.push({
+      value: parseInt(((values[i] / maxValue) * 100).toFixed(1)),
+      color: "#3B82F6",
+      language: keys[i],
+    });
+  }
+
+  return result;
+};
+
+export const ProgressChart = ({ languages }: { languages: { [key: string]: number } | null }) => {
+  const convertedLanguages = languages ? convertLanguages(languages) : [];
 
   const markers = [0, 25, 50, 75, 100];
 
@@ -18,20 +41,21 @@ export const ProgressChart = () => {
       </div>
 
       <div className="relative h-2 flex rounded-full overflow-hidden">
-        {segments.map((segment, index) => (
+        {convertedLanguages.map((language, index) => (
           <div
             key={index}
             className="h-full"
             style={{
-              backgroundColor: segment.color,
-              width: `${segment.value}%`,
+              backgroundColor: language.color,
+              width: `${language.value}%`,
             }}
           />
         ))}
       </div>
 
-      <ul className="py-2 flex items-center gap-4">
-        {segments.map(({ value, color, language }, i) => (
+      <ul className="py-2 flex items-center gap-4 flex-wrap">
+        {!convertedLanguages.length && <li className="flex items-center gap-1 text-sm">データがありません</li>}
+        {convertedLanguages.map(({ value, color, language }, i) => (
           <li className="flex items-center gap-1 text-sm font-semibold" key={`${language}-${i}`}>
             <p
               className="size-2 rounded-full"

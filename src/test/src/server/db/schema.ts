@@ -1,28 +1,20 @@
 import { relations, sql } from "drizzle-orm";
-import { index, pgTable, pgTableCreator, primaryKey, varchar } from "drizzle-orm/pg-core";
+import { index, pgTableCreator, primaryKey } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
-import { ulid } from "ulid";
+
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
  * database instance for multiple projects.
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = pgTableCreator((name) => `app_${name}`);
+export const createTable = pgTableCreator((name) => `test_${name}`);
 
-export const projects = createTable(
-  "project",
+export const posts = createTable(
+  "post",
   (d) => ({
-    id: d
-      .varchar({ length: 255 })
-      .notNull()
-      .primaryKey()
-      .$defaultFn(() => ulid()),
-    name: d.varchar({ length: 255 }).notNull(),
-    description: d.text(),
-    reflection: d.text(),
-    url: d.text().notNull(),
-    languages: d.json().$type<{ [key: string]: number }>(),
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: d.varchar({ length: 256 }),
     createdById: d
       .varchar({ length: 255 })
       .notNull()
@@ -33,65 +25,18 @@ export const projects = createTable(
       .notNull(),
     updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
   }),
-  (t) => [index("created_by_idx").on(t.createdById), index("name_idx").on(t.name)],
+  (t) => [
+    index("created_by_idx").on(t.createdById),
+    index("name_idx").on(t.name),
+  ]
 );
 
-export const tags = createTable("tag", (d) => ({
-  id: d
-    .varchar({ length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => ulid()),
-  label: d.varchar({ length: 255 }).notNull(),
-  value: d.varchar({ length: 255 }).notNull(),
-  createdAt: d
-    .timestamp({ withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-  updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-}));
-
-export const projectsTags = pgTable(
-  "project_tag",
-  {
-    projectId: varchar({ length: 255 })
-      .notNull()
-      .references(() => projects.id, { onDelete: "cascade" }),
-    tagId: varchar({ length: 255 })
-      .notNull()
-      .references(() => tags.id, { onDelete: "cascade" }),
-  },
-  (t) => [primaryKey({ columns: [t.projectId, t.tagId] })],
-);
-
-export const projectsRelations = relations(projects, ({ many }) => ({
-  projectsTags: many(projectsTags),
-}));
-
-export const tagsRelations = relations(tags, ({ many }) => ({
-  projectsTags: many(projectsTags),
-}));
-
-export const projectsTagsRelations = relations(projectsTags, ({ one }) => ({
-  project: one(projects, {
-    fields: [projectsTags.projectId],
-    references: [projects.id],
-  }),
-  tag: one(tags, {
-    fields: [projectsTags.tagId],
-    references: [tags.id],
-  }),
-}));
-
-/**
- * User関連
- */
 export const users = createTable("user", (d) => ({
   id: d
     .varchar({ length: 255 })
     .notNull()
     .primaryKey()
-    .$defaultFn(() => ulid()),
+    .$defaultFn(() => crypto.randomUUID()),
   name: d.varchar({ length: 255 }),
   email: d.varchar({ length: 255 }).notNull(),
   emailVerified: d
@@ -125,7 +70,10 @@ export const accounts = createTable(
     id_token: d.text(),
     session_state: d.varchar({ length: 255 }),
   }),
-  (t) => [primaryKey({ columns: [t.provider, t.providerAccountId] }), index("account_user_id_idx").on(t.userId)],
+  (t) => [
+    primaryKey({ columns: [t.provider, t.providerAccountId] }),
+    index("account_user_id_idx").on(t.userId),
+  ]
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -142,7 +90,7 @@ export const sessions = createTable(
       .references(() => users.id),
     expires: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
   }),
-  (t) => [index("t_user_id_idx").on(t.userId)],
+  (t) => [index("t_user_id_idx").on(t.userId)]
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -156,5 +104,5 @@ export const verificationTokens = createTable(
     token: d.varchar({ length: 255 }).notNull(),
     expires: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
   }),
-  (t) => [primaryKey({ columns: [t.identifier, t.token] })],
+  (t) => [primaryKey({ columns: [t.identifier, t.token] })]
 );

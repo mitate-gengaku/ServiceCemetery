@@ -3,8 +3,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
-import { accounts, projects } from "@/server/db/schema";
-import { type Project } from "@/types/project";
+import { accounts, projects, projectsTags } from "@/server/db/schema";
 
 export const projectRouter = createTRPCRouter({
   hello: publicProcedure.input(z.object({ text: z.string() })).query(({ input }) => {
@@ -14,9 +13,16 @@ export const projectRouter = createTRPCRouter({
   }),
 
   all: protectedProcedure.query(async ({ ctx }) => {
-    const projectsResult: Project[] = await ctx.db.query.projects.findMany({
+    const projectsResult = await ctx.db.query.projects.findMany({
       limit: 72,
       where: eq(projects.createdById, ctx.session.user.id),
+      with: {
+        projectsTags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
     });
 
     return projectsResult;
@@ -28,6 +34,7 @@ export const projectRouter = createTRPCRouter({
         name: z.string().nonempty(),
         description: z.string().nullable(),
         url: z.string().nonempty(),
+        tags: z.string().array(),
         reflection: z.string().nullable(),
       }),
     )
@@ -46,13 +53,27 @@ export const projectRouter = createTRPCRouter({
         repo: input.name,
       });
 
-      await ctx.db.insert(projects).values({
-        name: input.name,
-        description: input.description,
-        url: input.url,
-        reflection: input.reflection,
-        languages: Object.keys(languages.data).length ? languages.data : null,
-        createdById: ctx.session.user.id,
+      await ctx.db.transaction(async (tx) => {
+        const [{ id }] = await tx
+          .insert(projects)
+          .values({
+            name: input.name,
+            description: input.description,
+            url: input.url,
+            reflection: input.reflection,
+            languages: Object.keys(languages.data).length ? languages.data : null,
+            createdById: ctx.session.user.id,
+          })
+          .returning();
+
+        if (input.tags.length) {
+          input.tags.forEach(async (tagId) => {
+            await tx.insert(projectsTags).values({
+              tagId: tagId,
+              projectId: id,
+            });
+          });
+        }
       });
     }),
 });

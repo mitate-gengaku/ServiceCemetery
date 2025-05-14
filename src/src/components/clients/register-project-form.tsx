@@ -27,7 +27,7 @@ export const RegisterProjectForm = ({ tags, repositories }: Props) => {
     url: "",
   });
   const [reflection, setReflection] = useState<string>("");
-  const [selectedOptions, setSelectedOptions] = useState<MultiValue<{ label: string; value: string }>>([]);
+  const [selectedOptions, setSelectedOptions] = useState<MultiValue<Tag>>([]);
   const utils = api.useUtils();
   const createProject = api.project.create.useMutation({
     onSuccess: async () => {
@@ -41,9 +41,13 @@ export const RegisterProjectForm = ({ tags, repositories }: Props) => {
       className="space-y-4"
       onSubmit={(e) => {
         e.preventDefault();
+
+        const tagIdList = selectedOptions.map((select) => select.id);
+
         createProject.mutate({
           ...selectedRepository,
           reflection,
+          tags: tagIdList,
         });
       }}
     >

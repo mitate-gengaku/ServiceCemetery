@@ -16,7 +16,7 @@ const convertLanguages = (languages: { [key: string]: number }) => {
 
   for (let i = 0; i < keys.length; i++) {
     result.push({
-      value: parseInt(((values[i] / maxValue) * 100).toFixed(1)),
+      value: parseFloat(((values[i] / maxValue) * 100).toFixed(1)),
       color: "#3B82F6",
       language: keys[i],
     });

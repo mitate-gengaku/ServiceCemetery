@@ -8,6 +8,7 @@ import React, { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
 import { Markdown } from "@/components/libs/react-markdown/markdown";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,13 +23,30 @@ interface Props {
   isMyProject?: boolean;
 }
 
+const convertTags = (projects: Project[]) => {
+  const convertedProjects = projects.map((project) => {
+    return {
+      ...project,
+      tags: project.projectsTags ? project.projectsTags.map((pt) => pt.tag) : [],
+      projectsTags: undefined,
+    };
+  });
+
+  return convertedProjects;
+};
+
 export const Cemetery = ({ projects, isMyProject = false }: Props) => {
   const mergedProjects = useMemo(() => {
-    return projects.map((project, i) => ({
+    const convertedProjectTags = convertTags(projects);
+
+    const mergedPositionProjects = convertedProjectTags.map((project, i) => ({
       ...project,
       position: CEMETERY_POSITIONS[i].position,
     }));
+
+    return mergedPositionProjects;
   }, [projects]);
+
   const [selectIndex, setSelectIndex] = useState<number>(0);
   const [mermaidText, setMermaidText] = useAtom(mermaidFamily({ id: selectIndex.toString(), text: "" }));
   const [clicked, setClicked] = useState<boolean>(false);
@@ -166,11 +184,11 @@ flowchart LR
                       <div className="space-y-1">
                         <p className="text-xs text-muted-foreground font-semibold">タグ</p>
                         <div className="flex items-center flex-wrap gap-2">
-                          {/*mergedProjects[selectIndex].tags.map((tag, i) => (
-                          <Badge className="cursor-pointer bg-emerald-500 hover:bg-emerald-600" key={i}>
-                            {tag.label}
-                          </Badge>
-                        ))*/}
+                          {mergedProjects[selectIndex].tags.map((tag, i) => (
+                            <Badge className="cursor-pointer bg-emerald-500 hover:bg-emerald-600" key={i}>
+                              {tag.label}
+                            </Badge>
+                          ))}
                         </div>
                       </div>
                     </div>

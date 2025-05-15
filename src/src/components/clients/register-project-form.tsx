@@ -1,8 +1,10 @@
 "use client";
 
 import { ChevronDownIcon, CircleHelpIcon, XIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Select, { components, type MultiValue } from "react-select";
+import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,20 +20,31 @@ import { cn } from "@/utils/cn";
 interface Props {
   tags: Tag[];
   repositories: Repository[];
+  projectNames: string[];
 }
 
-export const RegisterProjectForm = ({ tags, repositories }: Props) => {
+export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props) => {
   const [selectedRepository, setSelectedRepository] = useState<Repository>({
     name: "",
     description: "",
     url: "",
   });
+  const router = useRouter();
   const [reflection, setReflection] = useState<string>("");
   const [selectedOptions, setSelectedOptions] = useState<MultiValue<Tag>>([]);
   const utils = api.useUtils();
   const createProject = api.project.create.useMutation({
     onSuccess: async () => {
       await utils.project.invalidate();
+      setSelectedRepository({
+        name: "",
+        description: "",
+        url: "",
+      });
+      setReflection("");
+      setSelectedOptions([]);
+      router.refresh();
+      toast.success("プロジェクトを追加しました");
     },
   });
 
@@ -58,6 +71,7 @@ export const RegisterProjectForm = ({ tags, repositories }: Props) => {
           objects={repositories}
           placeholder="リポジトリを選択してください"
           setSelectedOption={setSelectedRepository}
+          disabledNames={projectNames}
         />
       </div>
       <div className="space-y-1">

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const TopSectionClient = () => (
-  <>
+  <div className="py-8 md:py-0">
     <div className="space-y-1">
       <h2 className="text-4xl  font-cardo font-semibold tracking-tight text-center md:text-left">RIPro</h2>
       <h3 className="text-2xl font-semibold tracking-tight text-foreground text-center md:text-left">
@@ -16,5 +16,5 @@ export const TopSectionClient = () => (
     <Button className="bg-emerald-500 hover:bg-emerald-600" asChild>
       <Link href="/api/auth/signin">始める</Link>
     </Button>
-  </>
+  </div>
 );

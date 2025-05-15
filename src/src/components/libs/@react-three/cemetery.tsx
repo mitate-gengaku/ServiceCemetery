@@ -4,17 +4,30 @@ import { useGLTF, useCursor, Html } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
 import { useAtom } from "jotai";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import * as THREE from "three";
 
 import { Markdown } from "@/components/libs/react-markdown/markdown";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressChart } from "@/components/utils/progress-chart";
 import { CEMETERY_POSITIONS } from "@/config/cemetery";
 import { mermaidFamily } from "@/store/mermaid";
+import { api } from "@/trpc/react";
 import { type Project } from "@/types/project";
 import { cn } from "@/utils/cn";
 
@@ -59,6 +72,17 @@ export const Cemetery = ({ projects, isMyProject = false }: Props) => {
     "/textures/rock_01_nor_gl_4k.jpg",
     "/textures/rock_01_rough_4k.jpg",
   ]);
+  const utils = api.useUtils();
+  const router = useRouter();
+  const deleteProject = api.project.delete.useMutation({
+    onSuccess: async () => {
+      await utils.project.invalidate();
+      setClicked(false);
+      setSelectIndex(0);
+      toast.success("プロジェクトを削除しました");
+      router.refresh();
+    },
+  });
 
   useCursor(clicked);
   useCursor(hovered);
@@ -173,6 +197,39 @@ flowchart LR
                           {mergedProjects[selectIndex].url}
                         </Link>
                       </div>
+                      {isMyProject && (
+                        <div className="space-y-1">
+                          <p className="text-xs text-muted-foreground font-semibold">削除</p>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="destructive" size="sm" className="cursor-pointer">
+                                プロジェクトを削除
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>プロジェクトを削除</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  この操作は取り消せません。本当によろしいですか？
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <div className="flex items-center gap-2 justify-center md:justify-end">
+                                <AlertDialogCancel className="cursor-pointer">キャンセル</AlertDialogCancel>
+                                <AlertDialogAction
+                                  className={cn(buttonVariants({ variant: "destructive" }), "cursor-pointer")}
+                                  onClick={() => {
+                                    deleteProject.mutate({
+                                      id: mergedProjects[selectIndex].id,
+                                    });
+                                  }}
+                                >
+                                  削除
+                                </AlertDialogAction>
+                              </div>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
                   <TabsContent value="reflection">

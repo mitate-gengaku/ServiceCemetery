@@ -1,9 +1,17 @@
+import { LANGUAGE_COLORS } from "@/config/languages";
+
 type Language = {
   value: number;
   color: string;
   // start: number;
   // end: number;
   language: string;
+};
+
+const findMatchLanguage = (language: string) => {
+  const matchLanguage = LANGUAGE_COLORS.find((v) => v.name.toLowerCase() === language.toLowerCase());
+
+  return matchLanguage ? matchLanguage.color : "#e5e7eb";
 };
 
 const convertLanguages = (languages: { [key: string]: number }) => {
@@ -17,7 +25,7 @@ const convertLanguages = (languages: { [key: string]: number }) => {
   for (let i = 0; i < keys.length; i++) {
     result.push({
       value: parseFloat(((values[i] / maxValue) * 100).toFixed(1)),
-      color: "#3B82F6",
+      color: findMatchLanguage(keys[i]),
       language: keys[i],
     });
   }

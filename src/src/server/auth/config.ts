@@ -51,6 +51,13 @@ export const authConfig = {
         url: "https://github.com/login/oauth/authorize",
         params: { scope: "read:user,user:email,public_repo" },
       },
+      profile(profile) {
+        return {
+          email: profile.email,
+          name: profile.login,
+          image: profile.avatar_url,
+        };
+      },
     }),
   ],
   adapter: DrizzleAdapter(db, {

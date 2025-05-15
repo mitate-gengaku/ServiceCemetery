@@ -3,6 +3,7 @@ import { Geist, Cardo } from "next/font/google";
 import type { Metadata } from "next";
 
 import "@/app/globals.css";
+import { Toaster } from "@/components/ui/sonner";
 import { TRPCReactProvider } from "@/trpc/react";
 
 const geistSans = Geist({
@@ -31,6 +32,7 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body className={`w-screen h-screen ${geistSans.variable} ${cardo.variable} antialiased`}>
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <Toaster richColors theme="light" position="top-right" />
       </body>
     </html>
   );

@@ -64,7 +64,11 @@ export const projectsTags = pgTable(
   (t) => [primaryKey({ columns: [t.projectId, t.tagId] })],
 );
 
-export const projectsRelations = relations(projects, ({ many }) => ({
+export const projectsRelations = relations(projects, ({ one, many }) => ({
+  user: one(users, {
+    fields: [projects.createdById],
+    references: [users.id],
+  }),
   projectsTags: many(projectsTags),
 }));
 
@@ -105,6 +109,7 @@ export const users = createTable("user", (d) => ({
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  projects: many(projects),
 }));
 
 export const accounts = createTable(

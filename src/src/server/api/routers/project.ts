@@ -1,9 +1,11 @@
 import { Octokit } from "@octokit/rest";
-import { eq } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
 import { accounts, projects, projectsTags } from "@/server/db/schema";
+import { type Project } from "@/types/project";
 
 export const projectRouter = createTRPCRouter({
   hello: publicProcedure.input(z.object({ text: z.string() })).query(({ input }) => {
@@ -13,7 +15,7 @@ export const projectRouter = createTRPCRouter({
   }),
 
   all: protectedProcedure.query(async ({ ctx }) => {
-    const projectsResult = await ctx.db.query.projects.findMany({
+    const projectsResult: Project[] = await ctx.db.query.projects.findMany({
       limit: 72,
       where: eq(projects.createdById, ctx.session.user.id),
       with: {
@@ -25,7 +27,7 @@ export const projectRouter = createTRPCRouter({
       },
     });
 
-    return projectsResult;
+    return projectsResult ?? null;
   }),
 
   create: protectedProcedure
@@ -34,7 +36,7 @@ export const projectRouter = createTRPCRouter({
         name: z.string().nonempty(),
         description: z.string().nullable(),
         url: z.string().nonempty(),
-        tags: z.string().array(),
+        tags: z.string().array().nullable(),
         reflection: z.string().nullable(),
       }),
     )
@@ -66,7 +68,7 @@ export const projectRouter = createTRPCRouter({
           })
           .returning();
 
-        if (input.tags.length) {
+        if (input.tags && input.tags.length) {
           input.tags.forEach(async (tagId) => {
             await tx.insert(projectsTags).values({
               tagId: tagId,
@@ -75,5 +77,28 @@ export const projectRouter = createTRPCRouter({
           });
         }
       });
+    }),
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const id = input.id;
+
+        await ctx.db.transaction(async (tx) => {
+          await tx.delete(projects).where(and(eq(projects.id, id), eq(projects.createdById, ctx.session.user.id)));
+
+          await tx.delete(projectsTags).where(eq(projectsTags.projectId, id));
+        });
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "アイテムの削除中にエラーが発生しました",
+          cause: error,
+        });
+      }
     }),
 });

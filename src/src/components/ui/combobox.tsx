@@ -13,9 +13,10 @@ interface Props {
   objects: Repository[];
   placeholder?: string | undefined;
   setSelectedOption: React.Dispatch<React.SetStateAction<Repository>>;
+  disabledNames: string[];
 }
 
-export function Combobox({ objects, placeholder = "選択してください", setSelectedOption }: Props) {
+export function Combobox({ objects, placeholder = "選択してください", setSelectedOption, disabledNames }: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
 
@@ -47,6 +48,7 @@ export function Combobox({ objects, placeholder = "選択してください", se
                     setOpen(false);
                   }}
                   className="data-[selected=true]:bg-emerald-50"
+                  disabled={disabledNames.includes(object.name)}
                 >
                   {object.name}
                   <Check

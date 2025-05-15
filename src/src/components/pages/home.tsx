@@ -9,13 +9,17 @@ export const AuthHome = async () => {
   const tags = await api.tag.all();
   const repositories = await api.user.repositories();
   const projects = await api.project.all();
+  const projectNames = projects.length ? projects.map((pj) => pj.name) : [];
 
   return (
     <HydrateClient>
       <div className="w-full h-full relative flex flex-col md:flex-row">
         <TopSection>
-          <RegisterProjectForm tags={tags} repositories={repositories} />
+          <RegisterProjectForm tags={tags} repositories={repositories} projectNames={projectNames} />
         </TopSection>
+        {/**
+         * <MainCanvas projects={projects} isMyProject={true} />
+         */}
         <MainCanvas projects={projects} isMyProject={true} />
       </div>
     </HydrateClient>

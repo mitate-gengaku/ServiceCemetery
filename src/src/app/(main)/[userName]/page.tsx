@@ -22,11 +22,15 @@ const UserPage = async ({ params }: Props) => {
     notFound();
   }
 
+  const languages = user.projects.map(({ languages }) => ({
+    ...languages
+  }))
+
   return (
     <HydrateClient>
       <div className="w-full h-full relative flex flex-col md:flex-row">
         <TopSection>
-          <UserSection userName={user.name} imageUrl={user.image} />
+          <UserSection userName={user.name} imageUrl={user.image} languages={languages} />
         </TopSection>
         <MainCanvas isMyProject={session ? user.id === session.user.id : false} projects={user.projects} />
       </div>

@@ -20,7 +20,7 @@ export const Header = async () => {
   const session = await auth();
 
   return (
-    <header className="absolute w-full top-0 z-10">
+    <header>
       <div className="h-16 px-4 md:px-10 flex justify-between items-center gap-3 font-geist-sans">
         <h1 className="font-semibold text-2xl font-cardo cursor-default">
           <Link href="/">RIPro</Link>

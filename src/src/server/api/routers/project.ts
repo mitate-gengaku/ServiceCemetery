@@ -43,6 +43,13 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const result = await ctx.db.query.accounts.findFirst({
         where: eq(accounts.userId, ctx.session.user.id),
+        with: {
+          user: {
+            with: {
+              projects: true
+            }
+          }
+        }
       });
       const token = result?.access_token;
 
@@ -55,7 +62,14 @@ export const projectRouter = createTRPCRouter({
         repo: input.name,
       });
 
-      await ctx.db.transaction(async (tx) => {
+      if (result && result.user.projects.length >= 72) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "プロジェクトを追加できるのは72個までです",
+          });
+        }
+
+      try{await ctx.db.transaction(async (tx) => {
         const [{ id }] = await tx
           .insert(projects)
           .values({
@@ -77,6 +91,13 @@ export const projectRouter = createTRPCRouter({
           });
         }
       });
+      } catch (e) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "プロジェクトの作成中にエラーが発生しました",
+          cause: e,
+        });
+      }
     }),
   delete: protectedProcedure
     .input(
@@ -96,7 +117,7 @@ export const projectRouter = createTRPCRouter({
       } catch (error) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "アイテムの削除中にエラーが発生しました",
+          message: "プロジェクトの削除中にエラーが発生しました",
           cause: error,
         });
       }

@@ -46,6 +46,9 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
       router.refresh();
       toast.success("プロジェクトを追加しました");
     },
+    onError: async (e) => {
+      toast.error(e.shape?.message)
+    },
   });
 
   if (!tags.length) return <></>;

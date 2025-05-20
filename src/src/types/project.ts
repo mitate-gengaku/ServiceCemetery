@@ -7,6 +7,7 @@ export type Project = {
   languages: {
     [key: string]: number;
   } | null;
+  architecture: string | null;
   createdById: string;
   projectsTags: {
     projectId: string;

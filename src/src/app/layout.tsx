@@ -18,7 +18,7 @@ const cardo = Cardo({
 });
 
 export const metadata: Metadata = {
-  title: "RiPro | 失敗も成功も、すべては財産",
+  title: "RIPro | 失敗も成功も、すべては財産",
   description:
     "終了したプロジェクトの記録と教訓を大切に保存するサービスです。成功も失敗も、すべての経験を組織の財産として継承し、次世代のプロジェクトに活かします。過去から学び、未来を創るため共有しましょう。",
 };

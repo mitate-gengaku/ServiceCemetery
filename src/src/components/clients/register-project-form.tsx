@@ -24,6 +24,7 @@ interface Props {
 }
 
 export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props) => {
+  const [isLoading, setLoading] = useState<boolean>(false);
   const [selectedRepository, setSelectedRepository] = useState<Repository>({
     name: "",
     description: "",
@@ -45,9 +46,11 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
       setSelectedOptions([]);
       router.refresh();
       toast.success("プロジェクトを追加しました");
+      setLoading(false);
     },
     onError: async (e) => {
-      toast.error(e.shape?.message)
+      toast.error(e.shape?.message);
+      setLoading(false);
     },
   });
 
@@ -58,6 +61,7 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
       onSubmit={(e) => {
         e.preventDefault();
 
+        setLoading(true);
         const tagIdList = selectedOptions.map((select) => select.id);
 
         createProject.mutate({
@@ -193,7 +197,9 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
           onChange={(e) => setReflection(e.target.value)}
         />
       </div>
-      <Button className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer">プロジェクトを追加する</Button>
+      <Button className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer" disabled={isLoading}>
+        プロジェクトを追加する
+      </Button>
     </form>
   );
 };

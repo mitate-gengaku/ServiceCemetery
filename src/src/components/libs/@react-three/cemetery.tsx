@@ -74,56 +74,79 @@ export const Cemetery = ({ projects, isMyProject = false }: Props) => {
   ]);
   const utils = api.useUtils();
   const router = useRouter();
-  const deleteProject = api.project.delete.useMutation({
-    onSuccess: async () => {
+  const analizeArchitecture = api.project.architecture.useMutation({
+    onSuccess: async (data) => {
       await utils.project.invalidate();
-      setClicked(false);
-      setSelectIndex(0);
-      toast.success("プロジェクトを削除しました");
+      setLoading(false);
+      setMermaidText({ id: selectIndex.toString(), text: data });
+      toast.success("アーキテクチャ図を作成しました");
       router.refresh();
+    },
+    onError: async (e) => {
+      toast.error(e.shape?.message);
+      setLoading(false);
     },
   });
 
-  useCursor(clicked);
-  useCursor(hovered);
+  const updateProject = api.project.update.useMutation({
+    onSuccess: async () => {
+      await utils.project.invalidate();
+      setLoading(false);
+      toast.success("アーキテクチャ図を保存しました");
+      setMermaidText({
+        id: (0).toString(),
+        text: "",
+      });
+      router.refresh();
+    },
+    onError: async (e) => {
+      toast.error(e.shape?.message);
+      setLoading(false);
+    },
+  });
 
-  const generate = async () => {
+  const deleteProject = api.project.delete.useMutation({
+    onSuccess: async () => {
+      await utils.project.invalidate();
+      setSelectIndex(0);
+
+      setLoading(false);
+      setClicked(false);
+      toast.success("プロジェクトを削除しました");
+      router.refresh();
+    },
+    onError: async (e) => {
+      setSelectIndex(0);
+
+      toast.error(e.shape?.message);
+      setLoading(false);
+    },
+  });
+
+  const analizeProjectArchitecture = async (repo: string) => {
     setLoading(true);
-    await new Promise((resolv) => setTimeout(resolv, 5000));
-
-    setLoading(false);
-    setMermaidText({
-      id: selectIndex.toString(),
-      text: `~~~mermaid
-flowchart LR
-  subgraph "フロントエンド"
-      A[ページ] --> B[Reactコンポーネント];
-      B --> C[UIライブラリ];
-      C --> D[React Flow];
-      D --> E[ELK.js];
-      E --"レイアウト計算結果"--> D;
-      B --"データ取得"--> F[API];
-  end
-  subgraph "API"
-      F[API] --> G[ImportExportAnalyzer];
-      G --"HTTP 3000"--> F;
-  end
-  subgraph "バックエンド"
-      G[ImportExportAnalyzer] --"ファイル解析"--> H[ファイルシステム];
-      G --"依存関係グラフ"--> F;
-  end
-
-  style A fill:#ccf,stroke:#333,stroke-width:2px
-  style B fill:#ccf,stroke:#333,stroke-width:2px
-  style C fill:#ccf,stroke:#333,stroke-width:2px
-  style D fill:#ccf,stroke:#333,stroke-width:2px
-  style E fill:#ccf,stroke:#333,stroke-width:2px
-  style F fill:#ccf,stroke:#333,stroke-width:2px
-  style G fill:#ccf,stroke:#333,stroke-width:2px
-  style H fill:#ccf,stroke:#333,stroke-width:2px
-~~~`,
+    analizeArchitecture.mutate({
+      projectName: repo,
     });
   };
+
+  const updateProjectHandler = async (id: string) => {
+    setLoading(true);
+    updateProject.mutate({
+      id,
+      architecture: mermaidText.text,
+    });
+  };
+
+  const deleteProjectHandler = async (id: string) => {
+    setLoading(true);
+    deleteProject.mutate({
+      id,
+    });
+  };
+
+  useCursor(clicked);
+  useCursor(hovered);
 
   return (
     <group ref={groupRef}>
@@ -197,7 +220,7 @@ flowchart LR
                           {mergedProjects[selectIndex].url}
                         </Link>
                       </div>
-                      {isMyProject && (
+                      {(isMyProject || mergedProjects[selectIndex].architecture) && (
                         <div className="space-y-1">
                           <p className="text-xs text-muted-foreground font-semibold">削除</p>
                           <AlertDialog>
@@ -217,11 +240,7 @@ flowchart LR
                                 <AlertDialogCancel className="cursor-pointer">キャンセル</AlertDialogCancel>
                                 <AlertDialogAction
                                   className={cn(buttonVariants({ variant: "destructive" }), "cursor-pointer")}
-                                  onClick={() => {
-                                    deleteProject.mutate({
-                                      id: mergedProjects[selectIndex].id,
-                                    });
-                                  }}
+                                  onClick={() => deleteProjectHandler(mergedProjects[selectIndex].id)}
                                 >
                                   削除
                                 </AlertDialogAction>
@@ -250,30 +269,58 @@ flowchart LR
                       </div>
                     </div>
                   </TabsContent>
-                  {isMyProject && (
-                    <TabsContent value="ai">
-                      <div>
-                        {mermaidText.text.length ? (
-                          <div className="py-8 flex items-center justify-center flex-col gap-4">
+                  <TabsContent value="ai">
+                    <div>
+                      <div className="py-8 flex items-center justify-center flex-col gap-4">
+                        {mergedProjects[selectIndex].architecture && (
+                          <>
+                            <Markdown code={mergedProjects[selectIndex].architecture} />
+                            <div className="flex items-center justify-center gap-4">
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                className="cursor-pointer"
+                                disabled={isLoading}
+                                onClick={() => analizeProjectArchitecture(mergedProjects[selectIndex].name)}
+                              >
+                                やり直す
+                              </Button>
+                            </div>
+                          </>
+                        )}
+                        {mermaidText.text && (
+                          <>
                             <Markdown code={mermaidText.text} />
-                            <Button
-                              type="button"
-                              onClick={() => generate()}
-                              className={cn(
-                                "bg-emerald-500 hover:bg-blur-600 transition-all cursor-pointer disabled:bg-emerald-500 disabled:opacity-100",
-                                isLoading ? "animate-pulse" : "",
-                              )}
-                              disabled={isLoading}
-                            >
-                              やり直す
-                            </Button>
-                          </div>
-                        ) : (
+                            <div className="flex items-center justify-center gap-4">
+                              <Button
+                                type="button"
+                                className={cn(
+                                  "bg-emerald-500 hover:bg-emerald-600 transition-all cursor-pointer disabled:bg-emerald-500 disabled:opacity-100",
+                                  isLoading ? "animate-pulse" : "",
+                                )}
+                                disabled={isLoading}
+                                onClick={() => updateProjectHandler(mergedProjects[selectIndex].id)}
+                              >
+                                保存する
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                className="cursor-pointer"
+                                disabled={isLoading}
+                                onClick={() => analizeProjectArchitecture(mergedProjects[selectIndex].name)}
+                              >
+                                やり直す
+                              </Button>
+                            </div>
+                          </>
+                        )}
+                        {!mergedProjects[selectIndex].architecture && !mermaidText.text && (
                           <>
                             <div className="py-8 flex items-center justify-center flex-col gap-4">
                               <Button
                                 type="button"
-                                onClick={() => generate()}
+                                onClick={() => analizeProjectArchitecture(mergedProjects[selectIndex].name)}
                                 className={cn(
                                   "bg-emerald-500 hover:bg-blur-600 transition-all cursor-pointer disabled:bg-emerald-500 disabled:opacity-100",
                                   isLoading ? "animate-pulse" : "",
@@ -300,8 +347,8 @@ flowchart LR
                           </>
                         )}
                       </div>
-                    </TabsContent>
-                  )}
+                    </div>
+                  </TabsContent>
                 </Tabs>
               </div>
             </DialogContent>

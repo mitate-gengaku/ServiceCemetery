@@ -9,7 +9,7 @@ type Language = {
 };
 
 const findMatchLanguage = (language: string) => {
-  const matchLanguage = LANGUAGE_COLORS.find((v) => v.name.toLowerCase() === language.toLowerCase());
+  const matchLanguage = LANGUAGE_COLORS.find((v) => v.name === language.toLowerCase());
 
   return matchLanguage ? matchLanguage.color : "#e5e7eb";
 };

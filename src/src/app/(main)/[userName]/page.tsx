@@ -23,8 +23,8 @@ const UserPage = async ({ params }: Props) => {
   }
 
   const languages = user.projects.map(({ languages }) => ({
-    ...languages
-  }))
+    ...languages,
+  }));
 
   return (
     <HydrateClient>

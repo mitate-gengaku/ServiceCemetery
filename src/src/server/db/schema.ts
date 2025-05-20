@@ -23,6 +23,7 @@ export const projects = createTable(
     reflection: d.text(),
     url: d.text().notNull(),
     languages: d.json().$type<{ [key: string]: number }>(),
+    architecture: d.text(),
     createdById: d
       .varchar({ length: 255 })
       .notNull()

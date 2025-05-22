@@ -16,6 +16,11 @@ import { api } from "@/trpc/react";
 import { type Repository } from "@/types/repository";
 import { type Tag } from "@/types/tag";
 import { cn } from "@/utils/cn";
+  import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { error } from "console";
+import { WatchValue } from "@/components/libs/form/watch";
 
 interface Props {
   tags: Tag[];
@@ -23,27 +28,56 @@ interface Props {
   projectNames: string[];
 }
 
+const registerSchema = z.object({
+  name: z
+    .string({
+      required_error: "リポジトリを選択してください",
+      invalid_type_error: "文字列を入力してください",
+    }),
+  description: z.string().nullable(),
+  url: z
+    .string({
+      required_error: "リポジトリを選択してください",
+      invalid_type_error: "文字列を入力してください",
+    }),
+  reflection: z.string().max(256, "256文字まで入力できます").optional().nullable(),
+  tags: z.array(
+    z.object({
+      id: z.string(),
+      value: z.string(),
+      label: z.string(),
+    })
+  ).optional().nullable()
+});
+
+export type Register = z.infer<typeof registerSchema>
+
 export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props) => {
+  const [selectValue, setSelectValue] = useState("");
   const [isLoading, setLoading] = useState<boolean>(false);
-  const [selectedRepository, setSelectedRepository] = useState<Repository>({
-    name: "",
-    description: "",
-    url: "",
-  });
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    reset,
+    formState: { errors }
+  } = useForm<Register>({
+    resolver: zodResolver(registerSchema)
+  })
   const router = useRouter();
-  const [reflection, setReflection] = useState<string>("");
   const [selectedOptions, setSelectedOptions] = useState<MultiValue<Tag>>([]);
   const utils = api.useUtils();
   const createProject = api.project.create.useMutation({
     onSuccess: async () => {
       await utils.project.invalidate();
-      setSelectedRepository({
+      /*setSelectedRepository({
         name: "",
         description: "",
         url: "",
-      });
-      setReflection("");
-      setSelectedOptions([]);
+      });*/
+      // setReflection("");
+      // setSelectedOptions([]);
       router.refresh();
       toast.success("プロジェクトを追加しました");
       setLoading(false);
@@ -54,11 +88,22 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
     },
   });
 
-  if (!tags.length) return <></>;
+  const onSubmit = handleSubmit((data) => {
+    console.log(data)
+
+    setSelectValue("")
+    setValue("name", "")
+    setValue("description", "")
+    setValue("url", "")
+    setSelectedOptions([])
+    reset();
+  })
+
   return (
     <form
       className="space-y-4"
-      onSubmit={(e) => {
+      onSubmit={onSubmit}
+      /*onSubmit={(e) => {
         e.preventDefault();
 
         setLoading(true);
@@ -66,53 +111,68 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
 
         createProject.mutate({
           ...selectedRepository,
-          reflection,
           tags: tagIdList,
         });
-      }}
+      }}*/
     >
       <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">プロジェクトを追加</h3>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">リポジトリ</Label>
-        <Combobox
-          objects={repositories}
-          placeholder="リポジトリを選択してください"
-          setSelectedOption={setSelectedRepository}
-          disabledNames={projectNames}
-        />
+        <Controller
+          name="name"
+          control={control}
+          rules={{
+            required: "リポジトリを選択してください"
+          }}
+          render={() => (
+            <Combobox
+              objects={repositories}
+              setSelectedOption={setValue}
+              disabledNames={projectNames}
+              placeholder="リポジトリを選択してください"
+              name="name"
+              control={control}
+            />
+          )}
+          />
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">プロジェクト名</Label>
-        <div
+        <WatchValue
           className={cn(
             "dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed",
-            selectedRepository.name && "opacity-50",
+            errors.name && "bg-red-50 border-red-500"
           )}
-        >
-          {selectedRepository.name}
-        </div>
+          name="name"
+          control={control}
+        />
+        {errors.name && (
+          <p className="text-red-500 text-xs">{errors.name?.message}</p>
+        )}
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">プロジェクトの概要</Label>
-        <div
+        <WatchValue
           className={cn(
             "border-input dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed",
-            selectedRepository.description && "opacity-50",
           )}
-        >
-          {selectedRepository.description}
-        </div>
+          name="description"
+          control={control}
+        />
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">プロジェクトのリンク</Label>
-        <div
+        <WatchValue
           className={cn(
             "dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed",
-            selectedRepository.url && "opacity-50",
+            errors.url && "bg-red-50 border-red-500"
           )}
-        >
-          {selectedRepository.url}
-        </div>
+          name="url"
+          control={control}
+        />
+        {errors.url && (
+          <p className="text-red-500 text-xs">{errors.url?.message}</p>
+        )}
       </div>
       <div className="space-y-1">
         <div className="flex items-center justify-between">
@@ -130,72 +190,88 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
             </Tooltip>
           </TooltipProvider>
         </div>
-        <Select
-          options={tags}
-          className="text-sm cursor-pointer"
-          components={{
-            Control: (props) => {
-              return (
-                <components.Control
-                  {...props}
-                  className={cn(
-                    "dark:bg-input/30! border-input! flex w-full rounded-md! border bg-transparent transition-[color,box-shadow] cursor-pointer",
-                    props.isFocused && "shadow-none! ring-2 ring-emerald-500",
-                  )}
-                />
-              );
-            },
-            ClearIndicator: (props) => {
-              return (
-                <components.ClearIndicator {...props}>
-                  <XIcon className="size-4 hover:text-gray-800" />
-                </components.ClearIndicator>
-              );
-            },
-            DropdownIndicator: (props) => {
-              return (
-                <components.DropdownIndicator {...props}>
-                  <ChevronDownIcon className="size-4 hover:text-gray-800" />
-                </components.DropdownIndicator>
-              );
-            },
-            Option: (props) => {
-              return <components.Option {...props} className={cn(props.isFocused && "bg-emerald-50!")} />;
-            },
-            MultiValue: (props) => {
-              return (
-                <Badge variant={"outline"} className="py-1 bg-emerald-50 border-emerald-500">
-                  {props.data.label}
-                  <div
-                    onClick={(e) => props.removeProps.onClick!(e)}
-                    className="cursor-pointer rounded-full hover:bg-primary-foreground/20 p-0.5"
-                  >
-                    <XIcon className="size-3" />
-                  </div>
-                </Badge>
-              );
-            },
-            NoOptionsMessage: (props) => {
-              return <components.NoOptionsMessage {...props}>選択肢はありません</components.NoOptionsMessage>;
-            },
-            ValueContainer: (props) => {
-              return <components.ValueContainer {...props} className="gap-1" />;
-            },
-          }}
-          onChange={(v) => setSelectedOptions(v)}
-          isOptionDisabled={() => selectedOptions.length >= 10}
-          placeholder="ステータスを選んでください"
-          isMulti
-        />
+        <Controller 
+          name="tags"
+          control={control}
+          render={({ field }) => (
+            <Select
+              options={tags}
+              className="text-sm cursor-pointer"
+              components={{
+                Control: (props) => {
+                  return (
+                    <components.Control
+                      {...props}
+                      className={cn(
+                        "dark:bg-input/30! border-input! flex w-full rounded-md! border bg-transparent transition-[color,box-shadow] cursor-pointer",
+                        props.isFocused && "shadow-none! ring-2 ring-emerald-500",
+                      )}
+                    />
+                  );
+                },
+                ClearIndicator: (props) => {
+                  return (
+                    <components.ClearIndicator {...props}>
+                      <XIcon className="size-4 hover:text-gray-800" />
+                    </components.ClearIndicator>
+                  );
+                },
+                DropdownIndicator: (props) => {
+                  return (
+                    <components.DropdownIndicator {...props}>
+                      <ChevronDownIcon className="size-4 hover:text-gray-800" />
+                    </components.DropdownIndicator>
+                  );
+                },
+                Option: (props) => {
+                  return <components.Option {...props} className={cn(props.isFocused && "bg-emerald-50!")} />;
+                },
+                MultiValue: (props) => {
+                  return (
+                    <Badge variant={"outline"} className="py-1 bg-emerald-50 border-emerald-500">
+                      {props.data.label}
+                      <div
+                        onClick={(e) => props.removeProps.onClick!(e)}
+                        className="cursor-pointer rounded-full hover:bg-primary-foreground/20 p-0.5"
+                      >
+                        <XIcon className="size-3" />
+                      </div>
+                    </Badge>
+                  );
+                },
+                NoOptionsMessage: (props) => {
+                  return <components.NoOptionsMessage {...props}>選択肢はありません</components.NoOptionsMessage>;
+                },
+                ValueContainer: (props) => {
+                  return <components.ValueContainer {...props} className="gap-1" />;
+                },
+              }}
+              onChange={(v) => {
+                setSelectedOptions(v)
+                field.onChange(v)
+              }}
+              value={selectedOptions}
+              isOptionDisabled={() => selectedOptions.length >= 10}
+              placeholder="ステータスを選んでください"
+              isMulti
+            />
+          )}
+          />
+
+        {errors.tags && (
+          <p className="text-red-500 text-xs">{errors.tags?.message}</p>
+        )}
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">終了した理由・反省など</Label>
         <Textarea
           className="resize-none text-xs min-h-20 focus-visible:ring-2 focus-visible:ring-emerald-500"
           rows={55}
-          value={reflection}
-          onChange={(e) => setReflection(e.target.value)}
+          {...register("reflection")}
         />
+        {errors.reflection && (
+          <p className="text-red-500 text-xs">{errors.reflection.message}</p>
+        )}
       </div>
       <Button className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer" disabled={isLoading}>
         プロジェクトを追加する

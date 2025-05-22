@@ -3,9 +3,10 @@ import React from "react";
 
 import { UserSection } from "@/components/clients/user-section";
 import { MainCanvas } from "@/components/libs/@react-three/main";
-import { TopSection } from "@/components/utils/top-section";
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
+import { MainContainer } from "@/components/layout/main-container";
+import { LeftSectionContainer } from "@/components/layout/left-section-container";
 
 interface Props {
   params: Promise<{ userName: string }>;
@@ -26,7 +27,7 @@ const UserPage = async ({ params }: Props) => {
     ...languages,
   }));
 
-  return (
+  /*return (
     <HydrateClient>
       <div className="w-full h-full relative flex flex-col md:flex-row">
         <TopSection>
@@ -35,7 +36,21 @@ const UserPage = async ({ params }: Props) => {
         <MainCanvas isMyProject={session ? user.id === session.user.id : false} projects={user.projects} auth={session ? true : false} />
       </div>
     </HydrateClient>
-  );
+  );*/
+
+  return (
+    <HydrateClient>
+      <MainContainer>
+        <LeftSectionContainer>
+          <UserSection 
+            userName={user.name}
+            imageUrl={user.image}
+            languages={languages}
+            />
+        </LeftSectionContainer>
+      </MainContainer>
+    </HydrateClient>
+  )
 };
 
 export default UserPage;

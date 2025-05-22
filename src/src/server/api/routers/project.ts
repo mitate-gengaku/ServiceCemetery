@@ -85,12 +85,6 @@ flowchart LR
 `;
 
 export const projectRouter = createTRPCRouter({
-  hello: publicProcedure.input(z.object({ text: z.string() })).query(({ input }) => {
-    return {
-      greeting: `Hello ${input.text}`,
-    };
-  }),
-
   all: protectedProcedure.query(async ({ ctx }) => {
     const projectsResult: Project[] = await ctx.db.query.projects.findMany({
       limit: 72,

@@ -1,15 +1,17 @@
 import React from "react";
 
-import { TopSectionClient } from "@/components/clients/top";
+import { InfoSection } from "@/components/clients/top";
 import { MainCanvas } from "@/components/libs/@react-three/main";
-import { AuthHome } from "@/components/pages/home";
-import { TopSection } from "@/components/utils/top-section";
 import { auth } from "@/server/auth";
+import { MainContainer } from "@/components/layout/main-container";
+import { LeftSectionContainer } from "@/components/layout/left-section-container";
+import { HydrateClient } from "@/trpc/server";
+import { RegisterFormSection } from "@/components/clients/create-form-section";
 
 const Home = async () => {
   const session = await auth();
 
-  if (!session) {
+  /*if (!session) {
     return (
       <div className="w-full h-full relative flex flex-col md:flex-row">
         <TopSection>
@@ -20,7 +22,16 @@ const Home = async () => {
     );
   }
 
-  return <AuthHome />;
+  return <AuthHome />;*/
+  return (
+    <HydrateClient>
+      <MainContainer>
+        <LeftSectionContainer>
+          {session ? <RegisterFormSection /> : <InfoSection />}
+        </LeftSectionContainer>
+      </MainContainer>
+    </HydrateClient>
+  )
 };
 
 export default Home;

@@ -15,7 +15,7 @@ const Home = async () => {
         <TopSection>
           <TopSectionClient />
         </TopSection>
-        <MainCanvas isMyProject={true} />
+        <MainCanvas isMyProject={false} />
       </div>
     );
   }

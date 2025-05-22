@@ -15,9 +15,10 @@ import { type Project } from "@/types/project";
 interface Props {
   projects?: Project[] | undefined;
   isMyProject?: boolean | undefined;
+  auth?: boolean | undefined;
 }
 
-export const MainCanvas = ({ projects = CEMETERY_PROJECTS, isMyProject = false }: Props) => (
+export const MainCanvas = ({ projects = CEMETERY_PROJECTS, isMyProject = false, auth = false }: Props) => (
   <>
     <Loader />
     <Canvas
@@ -70,7 +71,7 @@ export const MainCanvas = ({ projects = CEMETERY_PROJECTS, isMyProject = false }
           <GraveStone />
           <Road />
           <Ground />
-          <Cemetery projects={projects} isMyProject={isMyProject} />
+          <Cemetery projects={projects} isMyProject={isMyProject} auth={auth} />
         </group>
 
         <OrbitControls

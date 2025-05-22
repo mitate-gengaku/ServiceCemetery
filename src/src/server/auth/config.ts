@@ -58,6 +58,7 @@ export const authConfig = {
           image: profile.avatar_url,
         };
       },
+      allowDangerousEmailAccountLinking: true
     }),
   ],
   adapter: DrizzleAdapter(db, {

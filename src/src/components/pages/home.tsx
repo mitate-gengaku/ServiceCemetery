@@ -17,10 +17,7 @@ export const AuthHome = async () => {
         <TopSection>
           <RegisterProjectForm tags={tags} repositories={repositories} projectNames={projectNames} />
         </TopSection>
-        {/**
-         * <MainCanvas projects={projects} isMyProject={true} />
-         */}
-        <MainCanvas projects={projects} isMyProject={true} />
+        <MainCanvas projects={projects} isMyProject={true} auth={true} />
       </div>
     </HydrateClient>
   );

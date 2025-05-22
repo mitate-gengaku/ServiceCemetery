@@ -34,6 +34,7 @@ import { cn } from "@/utils/cn";
 interface Props {
   projects: Project[];
   isMyProject?: boolean;
+  auth?: boolean;
 }
 
 const convertTags = (projects: Project[]) => {
@@ -48,7 +49,7 @@ const convertTags = (projects: Project[]) => {
   return convertedProjects;
 };
 
-export const Cemetery = ({ projects, isMyProject = false }: Props) => {
+export const Cemetery = ({ projects, isMyProject = false, auth = false }: Props) => {
   const mergedProjects = useMemo(() => {
     const convertedProjectTags = convertTags(projects);
 
@@ -191,7 +192,7 @@ export const Cemetery = ({ projects, isMyProject = false }: Props) => {
                   <TabsList>
                     <TabsTrigger value="detail">基本情報</TabsTrigger>
                     <TabsTrigger value="reflection">反省点</TabsTrigger>
-                    {isMyProject && <TabsTrigger value="ai">AI解析</TabsTrigger>}
+                    <TabsTrigger value="ai">AI解析</TabsTrigger>
                   </TabsList>
                   <TabsContent value="detail">
                     <div className="py-4 space-y-3">
@@ -315,7 +316,7 @@ export const Cemetery = ({ projects, isMyProject = false }: Props) => {
                             </div>
                           </>
                         )}
-                        {!mergedProjects[selectIndex].architecture && !mermaidText.text && (
+                        {isMyProject && !mergedProjects[selectIndex].architecture && !mermaidText.text && (
                           <>
                             <div className="py-8 flex items-center justify-center flex-col gap-4">
                               <Button

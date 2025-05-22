@@ -88,6 +88,7 @@ export const CEMETERY_PROJECTS: Project[] = CEMETERY_POSITIONS.map((_, i) => ({
     JavaScript: 645,
   },
   createdById: "unknown",
+  architecture: null,
   projectsTags: [
     {
       projectId: "01JV7E4M713JBC20WNMHSXR393",

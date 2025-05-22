@@ -32,7 +32,7 @@ const UserPage = async ({ params }: Props) => {
         <TopSection>
           <UserSection userName={user.name} imageUrl={user.image} languages={languages} />
         </TopSection>
-        <MainCanvas isMyProject={session ? user.id === session.user.id : false} projects={user.projects} />
+        <MainCanvas isMyProject={session ? user.id === session.user.id : false} projects={user.projects} auth={session ? true : false} />
       </div>
     </HydrateClient>
   );

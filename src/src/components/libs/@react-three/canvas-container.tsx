@@ -2,17 +2,15 @@
 
 import { OrbitControls, Loader, Sky } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import React, { ReactNode, Suspense } from "react";
+import React, { type ReactNode, Suspense } from "react";
 
 import { GraveStone } from "@/components/libs/@react-three/grave-stone";
 import { Ground } from "@/components/libs/@react-three/ground";
 import { Road } from "@/components/libs/@react-three/road";
 import { Tree } from "@/components/libs/@react-three/tree";
-import { CEMETERY_PROJECTS } from "@/config/cemetery";
-import { type Project } from "@/types/project";
 
 interface Props {
-  children?: ReactNode | undefined
+  children?: ReactNode | undefined;
 }
 
 export const CanvasContainer = ({ children }: Props) => (
@@ -88,4 +86,4 @@ export const CanvasContainer = ({ children }: Props) => (
       </Suspense>
     </Canvas>
   </>
-)
+);

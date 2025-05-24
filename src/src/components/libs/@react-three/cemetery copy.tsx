@@ -1,45 +1,23 @@
 "use client";
 
-import { useGLTF, useCursor, Html } from "@react-three/drei";
+import { useGLTF, useCursor } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
-import { useAtom } from "jotai";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { ReactNode, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
+import React, { type ReactNode, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
-import { Markdown } from "@/components/libs/react-markdown/markdown";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ProgressChart } from "@/components/utils/progress-chart";
 import { CEMETERY_POSITIONS } from "@/config/cemetery";
-import { mermaidFamily } from "@/store/mermaid";
-import { api } from "@/trpc/react";
 import { type Project } from "@/types/project";
-import { cn } from "@/utils/cn";
 import { convertTags } from "@/utils/convert-tags";
 
 interface Props {
   projects: Project[];
   children?: ReactNode;
-  setSelectIndex: React.Dispatch<React.SetStateAction<number>>
+  clicked: boolean;
+  setSelectIndex: React.Dispatch<React.SetStateAction<number>>;
+  setClicked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Cemetery = ({ projects, children, setSelectIndex }: Props) => {
-  const [clicked, setClicked] = useState<boolean>(false);
+export const Cemetery = ({ projects, children, clicked, setSelectIndex, setClicked }: Props) => {
   const [hovered, setHovered] = useState<boolean>(false);
   const groupRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF("/models/Cemetary.glb");
@@ -92,7 +70,7 @@ export const Cemetery = ({ projects, children, setSelectIndex }: Props) => {
           </group>
         );
       })}
-      {mergedProjects && <>{ children }</>}
+      {mergedProjects && <>{children}</>}
     </group>
   );
 };

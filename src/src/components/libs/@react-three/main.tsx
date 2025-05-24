@@ -4,7 +4,6 @@ import { OrbitControls, Loader, Sky } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import React, { Suspense } from "react";
 
-import { Cemetery } from "@/components/libs/@react-three/cemetery";
 import { GraveStone } from "@/components/libs/@react-three/grave-stone";
 import { Ground } from "@/components/libs/@react-three/ground";
 import { Road } from "@/components/libs/@react-three/road";
@@ -18,9 +17,13 @@ interface Props {
   auth?: boolean | undefined;
 }
 
-export const MainCanvas = ({ projects = CEMETERY_PROJECTS, isMyProject = false, auth = false }: Props) => (
+export const CanvasSection = ({ projects = CEMETERY_PROJECTS, isMyProject = false, auth = false }: Props) => (
   <>
-    <Loader />
+    <Loader
+      containerStyles={{
+        position: "fixed",
+      }}
+    />
     <Canvas
       shadows
       camera={{
@@ -71,7 +74,9 @@ export const MainCanvas = ({ projects = CEMETERY_PROJECTS, isMyProject = false, 
           <GraveStone />
           <Road />
           <Ground />
+          {/**
           <Cemetery projects={projects} isMyProject={isMyProject} auth={auth} />
+           */}
         </group>
 
         <OrbitControls

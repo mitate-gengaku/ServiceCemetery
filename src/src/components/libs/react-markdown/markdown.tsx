@@ -6,10 +6,7 @@ import { cn } from "@/utils/cn";
 export const Markdown = ({ code }: { code: string }) => (
   <ReactMarkdown
     components={{
-      // eslint-disable-next-line unused-imports/no-unused-vars
-      pre: (props) => (
-        <pre {...props} className={cn(props.className, "w-full")} />
-      ),
+      pre: (props) => <pre {...props} className={cn(props.className, "w-full")} />,
       code: ({ node, children }) => {
         return <Mermaid code={children as string} />;
       },

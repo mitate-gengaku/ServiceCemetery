@@ -1,8 +1,8 @@
-import { Badge } from "@/components/ui/badge"
-import { LANGUAGE_COLORS } from "@/config/languages"
+import { Badge } from "@/components/ui/badge";
+import { LANGUAGE_COLORS } from "@/config/languages";
 
 interface Props {
-  languages: string[]
+  languages: string[];
 }
 
 export const UserLanguages = ({ languages }: Props) => {
@@ -28,5 +28,5 @@ export const UserLanguages = ({ languages }: Props) => {
         ))}
       </ol>
     </div>
-  )
-}
+  );
+};

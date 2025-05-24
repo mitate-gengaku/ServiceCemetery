@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { accounts, projects, projectsTags } from "@/server/db/schema";
 import { type Project } from "@/types/project";
 import { requestToUithub } from "@/utils/uithub";

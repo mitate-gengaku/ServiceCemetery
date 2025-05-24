@@ -30,37 +30,15 @@ import { mermaidFamily } from "@/store/mermaid";
 import { api } from "@/trpc/react";
 import { type Project } from "@/types/project";
 import { cn } from "@/utils/cn";
+import { convertTags } from "@/utils/convert-tags";
 
 interface Props {
   projects: Project[];
   isMyProject?: boolean;
-  auth?: boolean;
+  authId?: string | undefined;
 }
 
-const convertTags = (projects: Project[]) => {
-  const convertedProjects = projects.map((project) => {
-    return {
-      ...project,
-      tags: project.projectsTags ? project.projectsTags.map((pt) => pt.tag) : [],
-      projectsTags: undefined,
-    };
-  });
-
-  return convertedProjects;
-};
-
-export const Cemetery = ({ projects, isMyProject = false, auth = false }: Props) => {
-  const mergedProjects = useMemo(() => {
-    const convertedProjectTags = convertTags(projects);
-
-    const mergedPositionProjects = convertedProjectTags.map((project, i) => ({
-      ...project,
-      position: CEMETERY_POSITIONS[i].position,
-    }));
-
-    return mergedPositionProjects;
-  }, [projects]);
-
+export const Cemetery = ({ projects, isMyProject = false, authId }: Props) => {
   const [selectIndex, setSelectIndex] = useState<number>(0);
   const [mermaidText, setMermaidText] = useAtom(mermaidFamily({ id: selectIndex.toString(), text: "" }));
   const [clicked, setClicked] = useState<boolean>(false);
@@ -73,6 +51,17 @@ export const Cemetery = ({ projects, isMyProject = false, auth = false }: Props)
     "/textures/rock_01_nor_gl_4k.jpg",
     "/textures/rock_01_rough_4k.jpg",
   ]);
+  const mergedProjects = useMemo(() => {
+    const convertedProjectTags = convertTags(projects);
+
+    const mergedPositionProjects = convertedProjectTags.map((project, i) => ({
+      ...project,
+      position: CEMETERY_POSITIONS[i].position,
+    }));
+
+    return mergedPositionProjects;
+  }, [projects]);
+
   const utils = api.useUtils();
   const router = useRouter();
   const analizeArchitecture = api.project.architecture.useMutation({

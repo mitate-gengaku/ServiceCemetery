@@ -2,11 +2,11 @@ import { notFound } from "next/navigation";
 import React from "react";
 
 import { UserSection } from "@/components/clients/user-section";
-import { MainCanvas } from "@/components/libs/@react-three/main";
+import { LeftSectionContainer } from "@/components/layout/left-section-container";
+import { MainContainer } from "@/components/layout/main-container";
+import { CanvasSection } from "@/components/libs/@react-three/main";
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
-import { MainContainer } from "@/components/layout/main-container";
-import { LeftSectionContainer } from "@/components/layout/left-section-container";
 
 interface Props {
   params: Promise<{ userName: string }>;
@@ -42,15 +42,12 @@ const UserPage = async ({ params }: Props) => {
     <HydrateClient>
       <MainContainer>
         <LeftSectionContainer>
-          <UserSection 
-            userName={user.name}
-            imageUrl={user.image}
-            languages={languages}
-            />
+          <UserSection userName={user.name} imageUrl={user.image} languages={languages} />
         </LeftSectionContainer>
+        <CanvasSection />
       </MainContainer>
     </HydrateClient>
-  )
+  );
 };
 
 export default UserPage;

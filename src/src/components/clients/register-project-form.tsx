@@ -1,11 +1,15 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDownIcon, CircleHelpIcon, XIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import Select, { components, type MultiValue } from "react-select";
 import { toast } from "sonner";
+import { z } from "zod";
 
+import { WatchValue } from "@/components/libs/form/watch";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
@@ -16,11 +20,6 @@ import { api } from "@/trpc/react";
 import { type Repository } from "@/types/repository";
 import { type Tag } from "@/types/tag";
 import { cn } from "@/utils/cn";
-  import { Controller, useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { error } from "console";
-import { WatchValue } from "@/components/libs/form/watch";
 
 interface Props {
   tags: Tag[];
@@ -29,31 +28,31 @@ interface Props {
 }
 
 const registerSchema = z.object({
-  name: z
-    .string({
-      required_error: "リポジトリを選択してください",
-      invalid_type_error: "文字列を入力してください",
-    }),
+  name: z.string({
+    required_error: "リポジトリを選択してください",
+    invalid_type_error: "文字列を入力してください",
+  }),
   description: z.string().nullable(),
-  url: z
-    .string({
-      required_error: "リポジトリを選択してください",
-      invalid_type_error: "文字列を入力してください",
-    }),
-  reflection: z.string().max(256, "256文字まで入力できます").optional().nullable(),
-  tags: z.array(
-    z.object({
-      id: z.string(),
-      value: z.string(),
-      label: z.string(),
-    })
-  ).optional().nullable()
+  url: z.string({
+    required_error: "リポジトリを選択してください",
+    invalid_type_error: "文字列を入力してください",
+  }),
+  reflection: z.string().max(256, "256文字まで入力できます").nullable(),
+  tags: z
+    .array(
+      z.object({
+        id: z.string(),
+        value: z.string(),
+        label: z.string(),
+      }),
+    )
+    .nullable()
+    .optional(),
 });
 
-export type Register = z.infer<typeof registerSchema>
+export type Register = z.infer<typeof registerSchema>;
 
 export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props) => {
-  const [selectValue, setSelectValue] = useState("");
   const [isLoading, setLoading] = useState<boolean>(false);
   const {
     register,
@@ -61,26 +60,24 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
     control,
     setValue,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<Register>({
-    resolver: zodResolver(registerSchema)
-  })
+    resolver: zodResolver(registerSchema),
+  });
   const router = useRouter();
   const [selectedOptions, setSelectedOptions] = useState<MultiValue<Tag>>([]);
   const utils = api.useUtils();
   const createProject = api.project.create.useMutation({
     onSuccess: async () => {
       await utils.project.invalidate();
-      /*setSelectedRepository({
-        name: "",
-        description: "",
-        url: "",
-      });*/
-      // setReflection("");
-      // setSelectedOptions([]);
-      router.refresh();
-      toast.success("プロジェクトを追加しました");
       setLoading(false);
+      setValue("name", "");
+      setValue("description", "");
+      setValue("url", "");
+      setSelectedOptions([]);
+      reset();
+      toast.success("プロジェクトを追加しました");
+      router.refresh();
     },
     onError: async (e) => {
       toast.error(e.shape?.message);
@@ -89,32 +86,18 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
   });
 
   const onSubmit = handleSubmit((data) => {
-    console.log(data)
+    setLoading(true);
+    const { tags, ...props } = data;
+    const tagIdList = tags ? tags.map((tag) => tag.id) : [];
 
-    setSelectValue("")
-    setValue("name", "")
-    setValue("description", "")
-    setValue("url", "")
-    setSelectedOptions([])
-    reset();
-  })
+    createProject.mutate({
+      ...props,
+      tags: tagIdList,
+    });
+  });
 
   return (
-    <form
-      className="space-y-4"
-      onSubmit={onSubmit}
-      /*onSubmit={(e) => {
-        e.preventDefault();
-
-        setLoading(true);
-        const tagIdList = selectedOptions.map((select) => select.id);
-
-        createProject.mutate({
-          ...selectedRepository,
-          tags: tagIdList,
-        });
-      }}*/
-    >
+    <form className="space-y-4" onSubmit={onSubmit}>
       <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">プロジェクトを追加</h3>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">リポジトリ</Label>
@@ -122,7 +105,7 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
           name="name"
           control={control}
           rules={{
-            required: "リポジトリを選択してください"
+            required: "リポジトリを選択してください",
           }}
           render={() => (
             <Combobox
@@ -134,21 +117,19 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
               control={control}
             />
           )}
-          />
+        />
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">プロジェクト名</Label>
         <WatchValue
           className={cn(
             "dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed",
-            errors.name && "bg-red-50 border-red-500"
+            errors.name && "bg-red-50 border-red-500",
           )}
           name="name"
           control={control}
         />
-        {errors.name && (
-          <p className="text-red-500 text-xs">{errors.name?.message}</p>
-        )}
+        {errors.name && <p className="text-red-500 text-xs">{errors.name?.message}</p>}
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">プロジェクトの概要</Label>
@@ -165,14 +146,12 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
         <WatchValue
           className={cn(
             "dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none cursor-not-allowed",
-            errors.url && "bg-red-50 border-red-500"
+            errors.url && "bg-red-50 border-red-500",
           )}
           name="url"
           control={control}
         />
-        {errors.url && (
-          <p className="text-red-500 text-xs">{errors.url?.message}</p>
-        )}
+        {errors.url && <p className="text-red-500 text-xs">{errors.url?.message}</p>}
       </div>
       <div className="space-y-1">
         <div className="flex items-center justify-between">
@@ -190,7 +169,7 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
             </Tooltip>
           </TooltipProvider>
         </div>
-        <Controller 
+        <Controller
           name="tags"
           control={control}
           render={({ field }) => (
@@ -247,8 +226,8 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
                 },
               }}
               onChange={(v) => {
-                setSelectedOptions(v)
-                field.onChange(v)
+                setSelectedOptions(v);
+                field.onChange(v);
               }}
               value={selectedOptions}
               isOptionDisabled={() => selectedOptions.length >= 10}
@@ -256,11 +235,9 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
               isMulti
             />
           )}
-          />
+        />
 
-        {errors.tags && (
-          <p className="text-red-500 text-xs">{errors.tags?.message}</p>
-        )}
+        {errors.tags && <p className="text-red-500 text-xs">{errors.tags?.message}</p>}
       </div>
       <div className="space-y-1">
         <Label className="text-muted-foreground text-xs">終了した理由・反省など</Label>
@@ -269,9 +246,7 @@ export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props)
           rows={55}
           {...register("reflection")}
         />
-        {errors.reflection && (
-          <p className="text-red-500 text-xs">{errors.reflection.message}</p>
-        )}
+        {errors.reflection && <p className="text-red-500 text-xs">{errors.reflection.message}</p>}
       </div>
       <Button className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer" disabled={isLoading}>
         プロジェクトを追加する

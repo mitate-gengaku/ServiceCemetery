@@ -2,11 +2,9 @@
 
 import { UserIcon } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { LANGUAGE_COLORS } from "@/config/languages";
-import { sortTop3Languages } from "@/utils/sort-top3-languages";
 import { UserLanguages } from "@/components/clients/user-languages";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { sortTop3Languages } from "@/utils/sort-top3-languages";
 
 interface Props {
   userName: string | null;
@@ -24,7 +22,7 @@ export const UserSection = ({ userName, imageUrl, languages }: Props) => {
       <Avatar className="size-36">
         <AvatarImage src={imageUrl ?? undefined} alt={userName ?? "プロフィール画像"} />
         <AvatarFallback className="animate-pulse">
-          <UserIcon className="animate-pulse"/>
+          <UserIcon className="animate-pulse" />
         </AvatarFallback>
       </Avatar>
       <div>

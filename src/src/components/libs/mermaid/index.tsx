@@ -1,13 +1,13 @@
+import { ZoomIn, ZoomOut, RotateCcw, Maximize2 } from "lucide-react";
 import mermaid from "mermaid";
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { ZoomIn, ZoomOut, RotateCcw, Maximize2 } from "lucide-react";
 
 export const Mermaid = (props: { code: string }) => {
   const { code } = props;
   const outputRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const id = React.useId();
-  
+
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -18,13 +18,13 @@ export const Mermaid = (props: { code: string }) => {
       try {
         const { svg } = await mermaid.render(id, code);
         outputRef.current.innerHTML = svg;
-        
+
         // SVGに変換を適用
-        const svgElement = outputRef.current.querySelector('svg');
+        const svgElement = outputRef.current.querySelector("svg");
         if (svgElement) {
           svgElement.style.transform = `translate(${position.x}px, ${position.y}px) scale(${zoom})`;
-          svgElement.style.transformOrigin = 'top left';
-          svgElement.style.transition = 'transform 0.2s ease';
+          svgElement.style.transformOrigin = "top left";
+          svgElement.style.transition = "transform 0.2s ease";
         }
       } catch (error) {
         console.error(error);
@@ -39,11 +39,11 @@ export const Mermaid = (props: { code: string }) => {
 
   // ズーム機能
   const handleZoomIn = () => {
-    setZoom(prev => Math.min(prev * 1.2, 5));
+    setZoom((prev) => Math.min(prev * 1.2, 5));
   };
 
   const handleZoomOut = () => {
-    setZoom(prev => Math.max(prev / 1.2, 0.1));
+    setZoom((prev) => Math.max(prev / 1.2, 0.1));
   };
 
   const handleReset = () => {
@@ -53,15 +53,15 @@ export const Mermaid = (props: { code: string }) => {
 
   const handleFitToView = () => {
     if (outputRef.current && containerRef.current) {
-      const svgElement = outputRef.current.querySelector('svg');
+      const svgElement = outputRef.current.querySelector("svg");
       if (svgElement) {
         const containerRect = containerRef.current.getBoundingClientRect();
         const svgRect = svgElement.getBoundingClientRect();
-        
+
         const scaleX = containerRect.width / svgRect.width;
         const scaleY = containerRect.height / svgRect.height;
         const newZoom = Math.min(scaleX, scaleY) * 0.9; // 少し余白を残す
-        
+
         setZoom(newZoom);
         setPosition({ x: 0, y: 0 });
       }
@@ -72,7 +72,7 @@ export const Mermaid = (props: { code: string }) => {
   const handleWheel = (e: React.WheelEvent) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setZoom(prev => Math.max(0.1, Math.min(5, prev * delta)));
+    setZoom((prev) => Math.max(0.1, Math.min(5, prev * delta)));
   };
 
   // ドラッグ機能
@@ -85,7 +85,7 @@ export const Mermaid = (props: { code: string }) => {
     if (isDragging) {
       setPosition({
         x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y
+        y: e.clientY - dragStart.y,
       });
     }
   };
@@ -98,18 +98,10 @@ export const Mermaid = (props: { code: string }) => {
     <div className="relative w-full h-96 border border-gray-300 rounded-lg overflow-hidden bg-white font-geist-sans">
       {/* ツールバー */}
       <div className="absolute top-2 left-2 z-10 flex gap-1 bg-white rounded-md shadow-lg border p-1">
-        <button
-          onClick={handleZoomIn}
-          className="p-2 hover:bg-gray-100 rounded transition-colors"
-          title="拡大"
-        >
+        <button onClick={handleZoomIn} className="p-2 hover:bg-gray-100 rounded transition-colors" title="拡大">
           <ZoomIn size={16} />
         </button>
-        <button
-          onClick={handleZoomOut}
-          className="p-2 hover:bg-gray-100 rounded transition-colors"
-          title="縮小"
-        >
+        <button onClick={handleZoomOut} className="p-2 hover:bg-gray-100 rounded transition-colors" title="縮小">
           <ZoomOut size={16} />
         </button>
         <button
@@ -119,11 +111,7 @@ export const Mermaid = (props: { code: string }) => {
         >
           <Maximize2 size={16} />
         </button>
-        <button
-          onClick={handleReset}
-          className="p-2 hover:bg-gray-100 rounded transition-colors"
-          title="リセット"
-        >
+        <button onClick={handleReset} className="p-2 hover:bg-gray-100 rounded transition-colors" title="リセット">
           <RotateCcw size={16} />
         </button>
       </div>
@@ -142,9 +130,9 @@ export const Mermaid = (props: { code: string }) => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        style={{ 
-          cursor: isDragging ? 'grabbing' : 'grab',
-          userSelect: 'none'
+        style={{
+          cursor: isDragging ? "grabbing" : "grab",
+          userSelect: "none",
         }}
       >
         <div ref={outputRef} className="w-full h-full" />

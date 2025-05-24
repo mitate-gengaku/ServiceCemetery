@@ -2,11 +2,15 @@ import React from "react";
 
 import { RegisterProjectForm } from "@/components/clients/register-project-form";
 import { api, HydrateClient } from "@/trpc/server";
+import { Project } from "@/types/project";
 
-export const RegisterFormSection = async () => {
+interface Props {
+  projects: Project[];
+}
+
+export const RegisterFormSection = async ({ projects }: Props) => {
   const tags = await api.tag.all();
   const repositories = await api.user.repositories();
-  const projects = await api.project.all();
   const projectNames = projects.length ? projects.map((pj) => pj.name) : [];
 
   return (

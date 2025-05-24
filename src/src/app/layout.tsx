@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" suppressHydrationWarning>
-      <body className={`w-screen h-screen ${geistSans.variable} ${cardo.variable} antialiased`}>
+      <body className={`w-screen h-screen overflow-hidden ${geistSans.variable} ${cardo.variable} antialiased`}>
         <TRPCReactProvider>{children}</TRPCReactProvider>
         <Toaster richColors theme="light" position="top-right" />
       </body>

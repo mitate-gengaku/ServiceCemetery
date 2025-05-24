@@ -27,11 +27,11 @@ interface Props {
   isLoading?: boolean | undefined;
   clicked: boolean;
   setClicked: React.Dispatch<React.SetStateAction<boolean>>;
-  isMyProject?: boolean | undefined;
+  authId?: string | undefined;
   children?: ReactNode;
 }
 
-export const CemeteryDialog = ({ project, clicked, setClicked, isMyProject = false, children }: Props) => {
+export const CemeteryDialog = ({ project, clicked, setClicked, authId, children }: Props) => {
   if (!project) return null;
 
   return (
@@ -71,7 +71,7 @@ export const CemeteryDialog = ({ project, clicked, setClicked, isMyProject = fal
                       {project.url}
                     </Link>
                   </div>
-                  {isMyProject && (
+                  {project.createdById === authId && (
                     <div className="space-y-1">
                       <p className="text-xs text-muted-foreground font-semibold">削除</p>
                       <AlertDialog>

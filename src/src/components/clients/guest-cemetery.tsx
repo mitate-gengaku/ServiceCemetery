@@ -34,11 +34,10 @@ flowchart LR
 
   subgraph "アプリケーション層"
       F[Webサーバー] --> H[APIサーバー];
-      H --> I[ビジネスロジック];
-      I --> J[認証・認可];
+      H --> J[認証・認可];
       J --> K[セッション管理];
       K --"データアクセス"--> L;
-      I --"データアクセス"--> L;
+      H --"データアクセス"--> L;
       F --"コンテンツ配信"--> B;
   end
 
@@ -59,9 +58,9 @@ flowchart LR
   end
 
   %% 外部サービスとの接続
-  I --> S;
+  H --> S;
   J --> U;
-  I --> T;
+  H --> T;
 
   %% スタイリング
   style A fill:#e1f5fe,stroke:#0277bd,stroke-width:2px
@@ -69,7 +68,6 @@ flowchart LR
 
   style F fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
   style H fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-  style I fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
   style J fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
   style K fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
 

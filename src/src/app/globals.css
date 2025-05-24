@@ -122,3 +122,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes hammerStrikeFast {
+  0% {
+    transform: scaleX(-1) rotate(0deg);
+  }
+
+  40% {
+    transform: scaleX(-1) rotate(90deg);
+  }
+
+  60% {
+    transform: scaleX(-1) rotate(45deg);
+  }
+
+  100% {
+    transform: scaleX(-1) rotate(0deg);
+  }
+}

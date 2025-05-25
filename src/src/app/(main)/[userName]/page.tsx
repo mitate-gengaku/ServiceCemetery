@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import React from "react";
 
+import { AuthCemetery } from "@/components/clients/auth-cemetery";
 import { UserSection } from "@/components/clients/user-section";
 import { LeftSectionContainer } from "@/components/layout/left-section-container";
 import { MainContainer } from "@/components/layout/main-container";
-import { CanvasSection } from "@/components/libs/@react-three/main";
+import { CanvasContainer } from "@/components/libs/@react-three/canvas-container";
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
 
@@ -27,24 +28,15 @@ const UserPage = async ({ params }: Props) => {
     ...languages,
   }));
 
-  /*return (
-    <HydrateClient>
-      <div className="w-full h-full relative flex flex-col md:flex-row">
-        <TopSection>
-          <UserSection userName={user.name} imageUrl={user.image} languages={languages} />
-        </TopSection>
-        <MainCanvas isMyProject={session ? user.id === session.user.id : false} projects={user.projects} auth={session ? true : false} />
-      </div>
-    </HydrateClient>
-  );*/
-
   return (
     <HydrateClient>
       <MainContainer>
         <LeftSectionContainer>
           <UserSection userName={user.name} imageUrl={user.image} languages={languages} />
         </LeftSectionContainer>
-        <CanvasSection />
+        <CanvasContainer>
+          <AuthCemetery authId={session ? session.user.id : ""} projects={user.projects} />
+        </CanvasContainer>
       </MainContainer>
     </HydrateClient>
   );

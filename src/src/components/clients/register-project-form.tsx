@@ -37,7 +37,7 @@ const registerSchema = z.object({
     required_error: "リポジトリを選択してください",
     invalid_type_error: "文字列を入力してください",
   }),
-  reflection: z.string().max(256, "256文字まで入力できます").nullable(),
+  reflection: z.string().max(256, "256文字まで入力できます").nullable().optional(),
   tags: z
     .array(
       z.object({

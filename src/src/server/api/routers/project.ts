@@ -148,7 +148,7 @@ export const projectRouter = createTRPCRouter({
         description: z.string().nullable(),
         url: z.string().nonempty(),
         tags: z.string().array().nullable(),
-        reflection: z.string().nullable(),
+        reflection: z.string().nullable().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

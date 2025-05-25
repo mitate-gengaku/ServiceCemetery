@@ -2,8 +2,9 @@
 
 import { useAtom } from "jotai";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import { Cemetery } from "@/components/libs/@react-three/cemetery copy";
+import { Cemetery } from "@/components/libs/@react-three/cemetery";
 import { CemeteryDialog } from "@/components/libs/@react-three/cemetery-dialog";
 import { Markdown } from "@/components/libs/react-markdown/markdown";
 import { Button } from "@/components/ui/button";
@@ -84,32 +85,18 @@ flowchart LR
   style U fill:#fff3e0,stroke:#f57c00,stroke-width:2px
 ~~~`,
     });
+    toast.success("アーキテクチャ図を作成しました");
   };
 
   return (
     <Cemetery projects={projects} clicked={clicked} setClicked={setClicked} setSelectIndex={setSelectIndex}>
       <CemeteryDialog
-        project={projects[selectIndex] ? projects[selectIndex] : undefined}
+        project={projects[selectIndex] ? projects[selectIndex] : null}
         clicked={clicked}
         setClicked={setClicked}
       >
         <div className="space-y-2">
-          {mermaidText.text && (
-            <>
-              <Markdown code={mermaidText.text} />
-              <div className="flex items-center justify-center gap-4">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="cursor-pointer"
-                  disabled={isLoading}
-                  onClick={() => generate()}
-                >
-                  やり直す
-                </Button>
-              </div>
-            </>
-          )}
+          {mermaidText.text && <Markdown code={mermaidText.text} />}
           {!mermaidText.text && (
             <>
               <div className="py-8 flex items-center justify-center flex-col gap-4">

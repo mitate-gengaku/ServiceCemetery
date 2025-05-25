@@ -2,7 +2,7 @@ import React from "react";
 
 import { RegisterProjectForm } from "@/components/clients/register-project-form";
 import { api, HydrateClient } from "@/trpc/server";
-import { Project } from "@/types/project";
+import { type Project } from "@/types/project";
 
 interface Props {
   projects: Project[];

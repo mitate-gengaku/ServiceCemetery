@@ -23,15 +23,16 @@ import { type Project } from "@/types/project";
 import { cn } from "@/utils/cn";
 
 interface Props {
-  project?: Project | undefined;
+  project: Project | null;
   isLoading?: boolean | undefined;
   clicked: boolean;
-  setClicked: React.Dispatch<React.SetStateAction<boolean>>;
   authId?: string | undefined;
+  setClicked: React.Dispatch<React.SetStateAction<boolean>>;
+  onDelete?: (id: string) => Promise<void> | undefined;
   children?: ReactNode;
 }
 
-export const CemeteryDialog = ({ project, clicked, setClicked, authId, children }: Props) => {
+export const CemeteryDialog = ({ project, clicked, authId, setClicked, onDelete, children }: Props) => {
   if (!project) return null;
 
   return (
@@ -47,7 +48,7 @@ export const CemeteryDialog = ({ project, clicked, setClicked, authId, children 
               <TabsList>
                 <TabsTrigger value="detail">基本情報</TabsTrigger>
                 <TabsTrigger value="reflection">反省点</TabsTrigger>
-                <TabsTrigger value="ai">AI解析</TabsTrigger>
+                {Object.keys(project.languages ?? {}).length ? <TabsTrigger value="ai">AI解析</TabsTrigger> : null}
               </TabsList>
               <TabsContent value="detail">
                 <div className="py-4 space-y-3">
@@ -91,7 +92,7 @@ export const CemeteryDialog = ({ project, clicked, setClicked, authId, children 
                             <AlertDialogCancel className="cursor-pointer">キャンセル</AlertDialogCancel>
                             <AlertDialogAction
                               className={cn(buttonVariants({ variant: "destructive" }), "cursor-pointer")}
-                              // onClick={() => deleteProjectHandler(project.id)}
+                              onClick={() => (onDelete ? onDelete(project.id) : undefined)}
                             >
                               削除
                             </AlertDialogAction>
@@ -120,9 +121,11 @@ export const CemeteryDialog = ({ project, clicked, setClicked, authId, children 
                   </div>
                 </div>
               </TabsContent>
-              <TabsContent value="ai">
-                <div>{children}</div>
-              </TabsContent>
+              {Object.keys(project.languages ?? {}).length ? (
+                <TabsContent value="ai">
+                  <div>{children}</div>
+                </TabsContent>
+              ) : null}
             </Tabs>
           </div>
         </DialogContent>

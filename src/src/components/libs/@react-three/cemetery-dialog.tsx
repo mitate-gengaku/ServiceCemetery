@@ -48,7 +48,9 @@ export const CemeteryDialog = ({ project, clicked, authId, setClicked, onDelete,
               <TabsList>
                 <TabsTrigger value="detail">基本情報</TabsTrigger>
                 <TabsTrigger value="reflection">反省点</TabsTrigger>
-                {Object.keys(project.languages ?? {}).length ? <TabsTrigger value="ai">AI解析</TabsTrigger> : null}
+                {authId && Object.keys(project.languages ?? {}).length ? (
+                  <TabsTrigger value="ai">AI解析</TabsTrigger>
+                ) : null}
               </TabsList>
               <TabsContent value="detail">
                 <div className="py-4 space-y-3">
@@ -121,7 +123,7 @@ export const CemeteryDialog = ({ project, clicked, authId, setClicked, onDelete,
                   </div>
                 </div>
               </TabsContent>
-              {Object.keys(project.languages ?? {}).length ? (
+              {authId && Object.keys(project.languages ?? {}).length ? (
                 <TabsContent value="ai">
                   <div>{children}</div>
                 </TabsContent>

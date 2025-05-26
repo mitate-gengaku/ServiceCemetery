@@ -35,8 +35,13 @@ export const AuthCemetery = ({ authId, projects }: Props) => {
     const currentProject = projects[selectIndex];
     if (!currentProject) return "none";
 
+    if (mermaidText.text) {
+      if (mermaidText.text !== currentProject.architecture) {
+        return "unsaved";
+      }
+      return "saved";
+    }
     if (currentProject.architecture) return "saved";
-    if (mermaidText.text) return "unsaved";
     return "none";
   };
 
@@ -46,7 +51,7 @@ export const AuthCemetery = ({ authId, projects }: Props) => {
     return currentProject?.architecture || "";
   };
 
-  const analyzeArchitecture = api.project.architecture.useMutation({
+  const analyzeArchitecture = api.project.analyze.useMutation({
     onSuccess: async (data) => {
       await utils.project.invalidate();
       setLoading(false);
@@ -158,8 +163,8 @@ export const AuthCemetery = ({ authId, projects }: Props) => {
                 isComplete={isComplete}
                 authId={authId}
                 project={currentProject}
-                onSave={() => {}}
-                onRegenerate={() => {}}
+                onSave={() => handleUpdateProject(currentProject.id, currentProject.createdById)}
+                onRegenerate={() => handleAnalyzeArchitecture(currentProject.name, currentProject.createdById)}
                 onGenerate={() => handleAnalyzeArchitecture(currentProject.name, currentProject.createdById)}
               />
               <DisclaimerList />

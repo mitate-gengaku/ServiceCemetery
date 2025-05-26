@@ -10,10 +10,10 @@ import {
   useWatch,
 } from "react-hook-form";
 
-import { type Register } from "@/components/clients/register-project-form";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { type Register } from "@/types/register";
 import { type Repository } from "@/types/repository";
 import { cn } from "@/utils/cn";
 

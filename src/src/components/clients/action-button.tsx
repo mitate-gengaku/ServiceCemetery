@@ -46,7 +46,7 @@ export const ActionButtons = ({
 
   return (
     <div className="flex items-center justify-center gap-4">
-      {!isComplete && (
+      {state === "unsaved" && !isComplete && (
         <Button
           type="button"
           className={cn(

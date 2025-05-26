@@ -7,7 +7,6 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Select, { components, type MultiValue } from "react-select";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import { WatchValue } from "@/components/libs/form/watch";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +15,9 @@ import { Combobox } from "@/components/ui/combobox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { registerSchema } from "@/schema/register";
 import { api } from "@/trpc/react";
+import { type Register } from "@/types/register";
 import { type Repository } from "@/types/repository";
 import { type Tag } from "@/types/tag";
 import { cn } from "@/utils/cn";
@@ -26,31 +27,6 @@ interface Props {
   repositories: Repository[];
   projectNames: string[];
 }
-
-const registerSchema = z.object({
-  name: z.string({
-    required_error: "リポジトリを選択してください",
-    invalid_type_error: "文字列を入力してください",
-  }),
-  description: z.string().nullable(),
-  url: z.string({
-    required_error: "リポジトリを選択してください",
-    invalid_type_error: "文字列を入力してください",
-  }),
-  reflection: z.string().max(256, "256文字まで入力できます").nullable().optional(),
-  tags: z
-    .array(
-      z.object({
-        id: z.string(),
-        value: z.string(),
-        label: z.string(),
-      }),
-    )
-    .nullable()
-    .optional(),
-});
-
-export type Register = z.infer<typeof registerSchema>;
 
 export const RegisterProjectForm = ({ tags, repositories, projectNames }: Props) => {
   const [isLoading, setLoading] = useState<boolean>(false);

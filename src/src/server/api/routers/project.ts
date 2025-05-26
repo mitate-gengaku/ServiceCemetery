@@ -5,6 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { analyzeRatelimit, createRatelimit } from "@/server/cache";
 import { accounts, projects, projectsTags } from "@/server/db/schema";
 import { type Project } from "@/types/project";
 import { requestToUithub } from "@/utils/uithub";
@@ -101,13 +102,16 @@ export const projectRouter = createTRPCRouter({
     return projectsResult ?? null;
   }),
 
-  architecture: protectedProcedure
+  analyze: protectedProcedure
     .input(
       z.object({
         projectName: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { success } = await analyzeRatelimit.limit(`analyze:${ctx.session.user.id}`);
+      if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "1日5回まで解析を行うことができます" });
+
       const userName = ctx.session.user.name;
 
       if (!userName) {
@@ -152,6 +156,9 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const { success } = await createRatelimit.limit(`create:${ctx.session.user.id}`);
+      if (!success) throw new TRPCError({ code: "TOO_MANY_REQUESTS" });
+
       const result = await ctx.db.query.accounts.findFirst({
         where: eq(accounts.userId, ctx.session.user.id),
         with: {

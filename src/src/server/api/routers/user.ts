@@ -72,7 +72,7 @@ export const userRouter = createTRPCRouter({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: e.message,
-          cause: e.cause
+          cause: e.cause,
         });
       }
       throw new TRPCError({

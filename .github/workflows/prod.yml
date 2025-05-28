@@ -7,6 +7,11 @@ on:
       - main
     types: [closed]
 
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 jobs:
   deploy:
     if: github.event.pull_request.merged == true
@@ -15,8 +20,6 @@ jobs:
       run:
         shell: bash
         working-directory: ./src
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,17 +27,6 @@ jobs:
           node-version: 22
      
       - run: npm i --global vercel@latest
-      - run: vercel pull --yes --environment=production --token=${{ secrets.vercel_token }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.vercel_org_id }}
-          VERCEL_PROJECT_ID: ${{ secrets.vercel_project_id }}
-
-      - run: vercel build --token=${{ secrets.vercel_token }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.vercel_org_id }}
-          VERCEL_PROJECT_ID: ${{ secrets.vercel_project_id }}
-
-      - run: vercel deploy --token=${{ secrets.vercel_token }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.vercel_org_id }}
-          VERCEL_PROJECT_ID: ${{ secrets.vercel_project_id }}
+      - run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+      - run: vercel deploy --token=${{ secrets.VERCEL_TOKEN }}

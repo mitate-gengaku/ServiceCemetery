@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { analyzeRatelimit, createRatelimit } from "@/server/cache";
+import { analyzeRatelimit, createRatelimit, redis } from "@/server/cache";
 import { accounts, projects, projectsTags } from "@/server/db/schema";
 import { type Project } from "@/types/project";
 import { requestToUithub } from "@/utils/uithub";
@@ -209,6 +209,9 @@ export const projectRouter = createTRPCRouter({
               });
             });
           }
+
+          const cacheKey = `repositories:${ctx.session.user.id}`;
+          redis.del(cacheKey);
         });
       } catch (e) {
         throw new TRPCError({

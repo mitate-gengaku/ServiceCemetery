@@ -1,8 +1,10 @@
 import { Octokit } from "@octokit/rest";
+import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
+import { redis } from "@/server/cache";
 import { accounts, users } from "@/server/db/schema";
 import { type Repository } from "@/types/repository";
 
@@ -32,27 +34,51 @@ export const userRouter = createTRPCRouter({
       return user;
     }),
   repositories: protectedProcedure.query(async ({ ctx }) => {
-    const result = await ctx.db.query.accounts.findFirst({
-      where: eq(accounts.userId, ctx.session.user.id),
-    });
-    const token = result?.access_token;
+    const cacheKey = `repositories:${ctx.session.user.id}`;
 
-    const octokit = new Octokit({
-      auth: token,
-    });
+    try {
+      const cachedData = await redis.get<Repository[]>(cacheKey);
 
-    const { data } = await octokit.rest.repos.listForUser({
-      username: ctx.session.user.name ?? "",
-      per_page: 100,
-      sort: "updated",
-    });
+      if (cachedData) {
+        return cachedData ?? [];
+      }
 
-    const repositories: Repository[] = data.map(({ name, description, html_url }) => ({
-      name,
-      description,
-      url: html_url,
-    }));
+      const result = await ctx.db.query.accounts.findFirst({
+        where: eq(accounts.userId, ctx.session.user.id),
+      });
+      const token = result?.access_token;
 
-    return repositories;
+      const octokit = new Octokit({
+        auth: token,
+      });
+
+      const { data } = await octokit.rest.repos.listForUser({
+        username: ctx.session.user.name ?? "",
+        per_page: 100,
+        sort: "updated",
+      });
+
+      const repositories: Repository[] = data.map(({ name, description, html_url }) => ({
+        name,
+        description,
+        url: html_url,
+      }));
+
+      await redis.set(cacheKey, JSON.stringify(repositories), { ex: 10800 });
+
+      return repositories;
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: e.message,
+          cause: e.cause
+        });
+      }
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "エラーが発生しました",
+      });
+    }
   }),
 });

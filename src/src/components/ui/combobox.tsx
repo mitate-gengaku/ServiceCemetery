@@ -2,26 +2,47 @@
 
 import { Check, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
+import {
+  type FieldPath,
+  type FieldValues,
+  type UseControllerProps,
+  type UseFormSetValue,
+  useWatch,
+} from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { type Register } from "@/types/register";
+import { type Repository } from "@/types/repository";
 import { cn } from "@/utils/cn";
 
 interface Props {
-  objects: { value: string; label: string }[];
+  objects: Repository[];
   placeholder?: string | undefined;
+  setSelectedOption: UseFormSetValue<Register>;
+  disabledNames: string[];
 }
 
-export function Combobox({ objects, placeholder = "選択してください" }: Props) {
+export const Combobox = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  objects,
+  placeholder = "選択してください",
+  setSelectedOption,
+  disabledNames,
+  ...props
+}: Props & UseControllerProps<TFieldValues, TName>) => {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
+
+  const value = useWatch(props);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant="outline" role="combobox" aria-expanded={open} className="min-w-[200px] justify-between">
-          {value ? objects.find((object) => object.value === value)?.label : placeholder}
+          {value ? objects.find((object) => object.name === String(value))?.name : placeholder}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -33,17 +54,23 @@ export function Combobox({ objects, placeholder = "選択してください" }: 
             <CommandGroup>
               {objects.map((object) => (
                 <CommandItem
-                  key={object.value}
-                  value={object.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
+                  key={object.name}
+                  value={object.name}
+                  onSelect={() => {
+                    setSelectedOption("name", object.name);
+                    setSelectedOption("description", object.description);
+                    setSelectedOption("url", object.url);
                     setOpen(false);
                   }}
                   className="data-[selected=true]:bg-emerald-50"
+                  disabled={disabledNames.includes(object.name)}
                 >
-                  {object.label}
+                  {object.name}
                   <Check
-                    className={cn("ml-auto text-emerald-500", value === object.value ? "opacity-100" : "opacity-0")}
+                    className={cn(
+                      "ml-auto text-emerald-500",
+                      object.name === String(value) ? "opacity-100" : "opacity-0",
+                    )}
                   />
                 </CommandItem>
               ))}
@@ -53,4 +80,4 @@ export function Combobox({ objects, placeholder = "選択してください" }: 
       </PopoverContent>
     </Popover>
   );
-}
+};

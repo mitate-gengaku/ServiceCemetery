@@ -1,4 +1,6 @@
-import { Vector3 } from "@react-three/fiber";
+import { type Vector3 } from "@react-three/fiber";
+
+import { type Project } from "@/types/project";
 
 export const CEMETERY_POSITIONS: { position: Vector3 }[] = [
   { position: [-40, 0.25, -40] },
@@ -75,14 +77,37 @@ export const CEMETERY_POSITIONS: { position: Vector3 }[] = [
   { position: [40, 0.25, 42] },
 ];
 
-export const CEMETERY_PROJECTS = CEMETERY_POSITIONS.map(({ position }, i) => ({
-  title: "リポジトリ" + (i + 1),
-  descripton: "説明" + (i + 1),
-  tags: [
+export const CEMETERY_PROJECTS: Project[] = CEMETERY_POSITIONS.map((_, i) => ({
+  id: (i + 1).toString(),
+  name: "リポジトリ" + (i + 1),
+  description: "説明" + (i + 1),
+  url: "https://github.com",
+  languages: {
+    HTML: 6515,
+    CSS: 1655,
+    JavaScript: 645,
+  },
+  createdById: "unknown",
+  architecture: null,
+  projectsTags: [
     {
-      label: "未完成",
+      projectId: "01JV7E4M713JBC20WNMHSXR393",
+      tagId: "01JV7B5XTE5BP52JEAGMQ54HCF",
+      tag: {
+        id: "01JV7B5XTE5BP52JEAGMQ54HCF",
+        label: "コードの供養",
+        value: "code-retired",
+      },
+    },
+    {
+      projectId: "01JV7E4M713JBC20WNMHSXR393",
+      tagId: "01JV7B5XTER8BXJZZTEKMR6ZP1",
+      tag: {
+        id: "01JV7B5XTER8BXJZZTEKMR6ZP1",
+        label: "未完成",
+        value: "incomplete",
+      },
     },
   ],
-  reflection: "反省文" + (i + 1),
-  position: position,
+  reflection: "反省" + (i + 1),
 }));

@@ -19,8 +19,6 @@ import { auth } from "@/server/auth";
 export const Header = async () => {
   const session = await auth();
 
-  // console.log(session)
-
   return (
     <header>
       <div className="h-16 px-4 md:px-10 flex justify-between items-center gap-3 font-geist-sans">

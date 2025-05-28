@@ -2,21 +2,24 @@
 
 import { OrbitControls, Loader, Sky } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import React, { Suspense } from "react";
+import React, { type ReactNode, Suspense } from "react";
 
-import { Cemetery } from "@/components/libs/@react-three/cemetery";
 import { GraveStone } from "@/components/libs/@react-three/grave-stone";
 import { Ground } from "@/components/libs/@react-three/ground";
 import { Road } from "@/components/libs/@react-three/road";
 import { Tree } from "@/components/libs/@react-three/tree";
 
 interface Props {
-  isMyProject?: boolean | undefined;
+  children?: ReactNode | undefined;
 }
 
-export const MainCanvas = ({ isMyProject = false }: Props) => (
+export const CanvasContainer = ({ children }: Props) => (
   <>
-    <Loader />
+    <Loader
+      containerStyles={{
+        position: "fixed",
+      }}
+    />
     <Canvas
       shadows
       camera={{
@@ -67,7 +70,7 @@ export const MainCanvas = ({ isMyProject = false }: Props) => (
           <GraveStone />
           <Road />
           <Ground />
-          <Cemetery isMyProject={isMyProject} />
+          {children}
         </group>
 
         <OrbitControls

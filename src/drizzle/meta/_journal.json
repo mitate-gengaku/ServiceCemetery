@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1747217104954,
-      "tag": "0000_rare_wither",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1747217127991,
-      "tag": "0001_misty_abomination",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1747730674957,
-      "tag": "0002_colorful_sprite",
+      "when": 1748435181830,
+      "tag": "0000_supreme_titanium_man",
       "breakpoints": true
     }
   ]

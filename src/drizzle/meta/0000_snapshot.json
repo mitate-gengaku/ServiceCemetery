@@ -1,5 +1,5 @@
 {
-  "id": "f52bf5b1-9780-400b-80fa-ada18d76fe28",
+  "id": "bea7065d-1fb5-44bf-8517-2fdd942b6971",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -161,6 +161,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "architecture": {
+          "name": "architecture",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "createdById": {
           "name": "createdById",
           "type": "varchar(255)",
@@ -229,6 +235,66 @@
         }
       },
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.project_tag": {
+      "name": "project_tag",
+      "schema": "",
+      "columns": {
+        "projectId": {
+          "name": "projectId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tagId": {
+          "name": "tagId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "project_tag_projectId_app_project_id_fk": {
+          "name": "project_tag_projectId_app_project_id_fk",
+          "tableFrom": "project_tag",
+          "tableTo": "app_project",
+          "columnsFrom": [
+            "projectId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "project_tag_tagId_app_tag_id_fk": {
+          "name": "project_tag_tagId_app_tag_id_fk",
+          "tableFrom": "project_tag",
+          "tableTo": "app_tag",
+          "columnsFrom": [
+            "tagId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "project_tag_projectId_tagId_pk": {
+          "name": "project_tag_projectId_tagId_pk",
+          "columns": [
+            "projectId",
+            "tagId"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},

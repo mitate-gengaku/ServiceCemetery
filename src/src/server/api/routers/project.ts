@@ -87,19 +87,43 @@ flowchart LR
 
 export const projectRouter = createTRPCRouter({
   all: protectedProcedure.query(async ({ ctx }) => {
-    const projectsResult: Project[] = await ctx.db.query.projects.findMany({
-      limit: 72,
-      where: eq(projects.createdById, ctx.session.user.id),
-      with: {
-        projectsTags: {
-          with: {
-            tag: true,
+    const cacheKey = `projects:${ctx.session.user.id}`;
+
+    try {
+      const cachedData = await redis.get<Project[]>(cacheKey);
+
+      if (cachedData) {
+        return cachedData ?? [];
+      }
+
+      const projectsResult: Project[] = await ctx.db.query.projects.findMany({
+        limit: 72,
+        where: eq(projects.createdById, ctx.session.user.id),
+        with: {
+          projectsTags: {
+            with: {
+              tag: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return projectsResult ?? null;
+      await redis.set(cacheKey, JSON.stringify(projectsResult), { ex: 10800 });
+
+      return projectsResult ?? [];
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: e.message,
+          cause: e.cause,
+        });
+      }
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "エラーが発生しました",
+      });
+    }
   }),
 
   analyze: protectedProcedure
@@ -210,7 +234,7 @@ export const projectRouter = createTRPCRouter({
             });
           }
 
-          const cacheKey = `repositories:${ctx.session.user.id}`;
+          const cacheKey = `projects:${ctx.session.user.id}`;
           redis.del(cacheKey);
         });
       } catch (e) {

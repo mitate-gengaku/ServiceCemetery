@@ -5,7 +5,7 @@ on:
   pull_request:
     branches:
       - dev
-    types: [closed]
+    types: [opened, reopened, synchronize]
 
 jobs:
   deploy:
@@ -14,7 +14,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./app
+        working-directory: ./src
     permissions:
       contents: read
     steps:

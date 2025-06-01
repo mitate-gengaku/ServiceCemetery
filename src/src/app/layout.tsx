@@ -6,6 +6,7 @@ import "@/app/globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { TRPCReactProvider } from "@/trpc/react";
 import { rootMetaData } from "@/config/root-metadata";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +29,10 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className={`w-screen h-screen overflow-hidden ${geistSans.variable} ${cardo.variable} antialiased`}>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
-        <Toaster richColors theme="light" position="top-right" />
+        <TooltipProvider>
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <Toaster richColors theme="light" position="top-right" />
+        </TooltipProvider>
       </body>
     </html>
   );

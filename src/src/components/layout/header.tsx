@@ -15,19 +15,37 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MODELS_LIST } from "@/config/credit";
 import { auth } from "@/server/auth";
+import { GithubIcon } from "@/components/icons/github";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { XIcon } from "@/components/icons/x";
 
 export const Header = async () => {
   const session = await auth();
 
   return (
     <header>
-      <div className="h-16 px-4 md:px-10 flex justify-between items-center gap-3 font-geist-sans">
+      <div className="h-16 px-4 md:px-10 flex justify-between items-center gap-2 font-geist-sans">
         <h1 className="font-semibold text-2xl font-cardo cursor-default">
           <Link href="/">RIPro</Link>
         </h1>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant={"ghost"}
+              size={"icon"}
+              className="ml-auto"
+              asChild
+            >
+              <Link href={"https://x.com/mitate_gengaku"}>
+                <XIcon />
+            </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>開発者のX</TooltipContent>
+        </Tooltip>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant={"ghost"} size={"icon"} className="ml-auto cursor-pointer">
+            <Button variant={"ghost"} size={"icon"} className="cursor-pointer">
               <InfoIcon />
             </Button>
           </DropdownMenuTrigger>

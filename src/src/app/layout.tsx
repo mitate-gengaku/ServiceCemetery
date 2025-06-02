@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 
 import "@/app/globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { TRPCReactProvider } from "@/trpc/react";
-import { rootMetaData } from "@/config/root-metadata";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { rootMetaData } from "@/config/root-metadata";
+import { TRPCReactProvider } from "@/trpc/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,7 +19,7 @@ const cardo = Cardo({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = rootMetaData
+export const metadata: Metadata = rootMetaData;
 
 export default function RootLayout({
   children,

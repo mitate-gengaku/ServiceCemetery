@@ -1,6 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { count, eq, like } from "drizzle-orm";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "@/server/api/trpc";
@@ -81,4 +81,67 @@ export const userRouter = createTRPCRouter({
       });
     }
   }),
+  search: publicProcedure
+    .input(
+      z.object({
+        query: z.string().nullable(),
+        page: z.string().nullish(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { query, page } = input;
+      const currentPage = parseInt(page || "1");
+      const limit = 6;
+      const offset = (currentPage - 1) * limit;
+      const conditions = like(users.name, `%${query}%`);
+
+      try {
+        const searchResults = await ctx.db.query.users.findMany({
+          where: conditions,
+          limit: limit,
+          offset: offset,
+          columns: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        });
+
+        const totalCountResult = await ctx.db.select({ count: count() }).from(users).where(conditions);
+        const totalCount = totalCountResult[0]?.count || 0;
+        const totalPages = Math.ceil(totalCount / limit);
+        const hasNextPage = currentPage < totalPages;
+        const hasPrevPage = currentPage > 1;
+
+        return {
+          data: searchResults,
+          pagination: {
+            currentPage,
+            totalPages,
+            totalCount,
+            limit,
+            hasNextPage,
+            hasPrevPage,
+            nextPage: hasNextPage ? currentPage + 1 : null,
+            prevPage: hasPrevPage ? currentPage - 1 : null,
+          },
+          searchInfo: {
+            query,
+            resultsCount: searchResults.length,
+          },
+        };
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new TRPCError({
+            message: "検索中にエラーが発生しました",
+            code: "INTERNAL_SERVER_ERROR",
+            cause: error.cause,
+          });
+        }
+        throw new TRPCError({
+          message: "検索中にエラーが発生しました",
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+    }),
 });

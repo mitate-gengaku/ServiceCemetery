@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 
 import "@/app/globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { rootMetaData } from "@/config/root-metadata";
 import { TRPCReactProvider } from "@/trpc/react";
 
 const geistSans = Geist({
@@ -17,11 +19,7 @@ const cardo = Cardo({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "RIPro | 失敗も成功も、すべては財産",
-  description:
-    "終了したプロジェクトの記録と教訓を大切に保存するサービスです。成功も失敗も、すべての経験を組織の財産として継承し、次世代のプロジェクトに活かします。過去から学び、未来を創るため共有しましょう。",
-};
+export const metadata: Metadata = rootMetaData;
 
 export default function RootLayout({
   children,
@@ -31,8 +29,10 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className={`w-screen h-screen overflow-hidden ${geistSans.variable} ${cardo.variable} antialiased`}>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
-        <Toaster richColors theme="light" position="top-right" />
+        <TooltipProvider>
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <Toaster richColors theme="light" position="top-right" />
+        </TooltipProvider>
       </body>
     </html>
   );
